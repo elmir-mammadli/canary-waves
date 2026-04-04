@@ -1,29 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import type { FAQContent } from '@/lib/landing-content';
 
-const faqs = [
-  {
-    question: 'How does Canary Waves work on-site?',
-    answer:
-      'Canary Waves connects to your existing radio data workflows and turns communication into structured operational signals without changing frontline behavior.',
-  },
-  {
-    question: 'What industries do you support?',
-    answer:
-      'We focus on mining, manufacturing, and energy operations where communication quality directly affects safety and performance.',
-  },
-  {
-    question: 'Do teams need extensive training?',
-    answer:
-      'No. The platform is designed for low-friction rollout and minimal workflow disruption for supervisors and site teams.',
-  },
-  {
-    question: 'How does data privacy work?',
-    answer:
-      'Canary Waves is designed for secure processing with strong controls, role-based visibility, and strict handling of sensitive operational data.',
-  },
-];
+interface FAQProps {
+  content: FAQContent;
+}
 
 function FAQItem({ question, answer }: { question: string; answer: string }) {
   const [open, setOpen] = useState(false);
@@ -41,14 +23,14 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
   );
 }
 
-export default function FAQ() {
+export default function FAQ({ content }: FAQProps) {
   return (
     <section className="section section-faq" data-reveal>
       <div className="shell">
-        <p className="eyebrow">FAQ</p>
-        <h2 className="section-title">Common questions from operations leaders.</h2>
+        <p className="eyebrow">{content.eyebrow}</p>
+        <h2 className="section-title">{content.title}</h2>
         <div className="faq-list">
-          {faqs.map((faq) => (
+          {content.items.map((faq) => (
             <FAQItem key={faq.question} question={faq.question} answer={faq.answer} />
           ))}
         </div>

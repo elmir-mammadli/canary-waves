@@ -9,20 +9,25 @@ import Team from '@/components/Team';
 import FAQ from '@/components/FAQ';
 import Footer from '@/components/Footer';
 import RequestDemoModal from '@/components/RequestDemoModal';
+import { getLandingPageContent } from '@/lib/strapi';
 
-export default function Home() {
+export const revalidate = 60;
+
+export default async function Home() {
+  const content = await getLandingPageContent();
+
   return (
     <>
       <Navbar />
       <main className="site-main">
-        <Hero />
-        <About />
-        <Features />
-        <HowItWorks />
-        <WhyUs />
-        <Team />
+        <Hero content={content.hero} />
+        <About content={content.about} />
+        <Features content={content.features} />
+        <HowItWorks content={content.workflow} />
+        <WhyUs content={content.whyUs} />
+        <Team content={content.team} />
         <CTAForm />
-        <FAQ />
+        <FAQ content={content.faq} />
       </main>
       <Footer />
       <RequestDemoModal />

@@ -1,46 +1,27 @@
 import Image from 'next/image';
+import type { FeaturesContent } from '@/lib/landing-content';
 
-const features = [
-  {
-    title: 'Equipment Communication and Collision Prevention',
-    summary:
-      'Surface unsafe pass communication patterns before they turn into metal-on-metal incidents.',
-    image: '/images/feature-1.avif',
-    alt: 'Heavy equipment in operation',
-  },
-  {
-    title: 'Hazard Identification and Mitigation Tracking',
-    summary:
-      'Capture hazard mentions and follow-up actions so mitigation is visible, auditable, and timely.',
-    image: '/images/feature-2.avif',
-    alt: 'Worker conducting site inspection',
-  },
-  {
-    title: 'Contractor Oversight and KPI Confidence',
-    summary:
-      'Measure contract delivery and frontline execution through real communication, not assumptions.',
-    image: '/images/feature-3.avif',
-    alt: 'Industrial site operations from above',
-  },
-];
+interface FeaturesProps {
+  content: FeaturesContent;
+}
 
-export default function Features() {
+export default function Features({ content }: FeaturesProps) {
   return (
     <section id="signals" className="section section-signals" data-reveal>
       <div className="shell">
-        <p className="eyebrow">Signals</p>
-        <h2 className="section-title">What Canary Waves detects every shift.</h2>
+        <p className="eyebrow">{content.eyebrow}</p>
+        <h2 className="section-title">{content.title}</h2>
 
         <div className="feature-stack">
-          {features.map((feature, index) => (
+          {content.items.map((feature, index) => (
             <article
               key={feature.title}
               className={`feature-row ${index % 2 === 0 ? '' : 'is-reversed'}`.trim()}
             >
               <div className="feature-media-wrap">
                 <Image
-                  src={feature.image}
-                  alt={feature.alt}
+                  src={feature.imageUrl}
+                  alt={feature.imageAlt}
                   width={990}
                   height={624}
                   className="feature-media"

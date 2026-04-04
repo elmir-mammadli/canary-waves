@@ -10,17 +10,16 @@ Built with [Next.js 14](https://nextjs.org/), [React 18](https://react.dev/), [T
 
 | Section | Description |
 |---|---|
-| **Navbar** | Responsive navigation with mobile hamburger menu and "Request a Demo" CTA |
-| **Hero** | Full-width hero with headline, subtext, and call-to-action |
-| **About** | Brief introduction to what Canary Waves is |
-| **Features** | Three feature rows (alternating image/text layout) covering key product capabilities |
-| **How It Works** | Step-by-step breakdown of the platform workflow |
-| **Why Us** | Differentiators and value proposition |
-| **Stats** | Key metrics and impact numbers |
-| **CTA Form** | Demo request form |
-| **Team** | Team member profiles |
-| **FAQ** | Frequently asked questions |
-| **Footer** | Links and company info |
+| **Navbar** | Responsive navigation with mobile hamburger menu and "Request Demo" CTA |
+| **Hero** | CMS editable (Strapi) |
+| **About / Platform** | CMS editable (Strapi) |
+| **Features / Signals** | CMS editable (Strapi) |
+| **How It Works / Workflow** | CMS editable (Strapi) |
+| **Why Us** | CMS editable (Strapi) |
+| **Team** | CMS editable (Strapi) |
+| **FAQ** | CMS editable (Strapi) |
+| **CTA Form** | Static (not CMS editable) |
+| **Footer** | Static (not CMS editable) |
 
 ---
 
@@ -44,6 +43,12 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### Strapi CMS
+
+To make section content editable for non-technical users, this project reads section content from Strapi.
+
+Setup guide: [STRAPI_SETUP.md](./STRAPI_SETUP.md)
 
 ### Build
 
@@ -69,13 +74,15 @@ src/
 │   ├── Features.tsx
 │   ├── HowItWorks.tsx
 │   ├── WhyUs.tsx
-│   ├── Stats.tsx
 │   ├── CTAForm.tsx
 │   ├── Team.tsx
 │   ├── FAQ.tsx
+│   ├── RequestDemoModal.tsx
 │   └── Footer.tsx
 └── lib/
-    └── fonts.ts          # Custom font configuration
+    ├── fonts.ts          # Custom font configuration
+    ├── landing-content.ts # CMS section types + local defaults
+    └── strapi.ts         # Strapi fetch + response mapping
 public/
 ├── canary_waves_logo.svg
 └── images/

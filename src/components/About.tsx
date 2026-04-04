@@ -1,25 +1,21 @@
-const pillars = [
-  'Transcribes two-way radio streams into searchable operational context.',
-  'Flags leading indicators for collision risk, protocol misses, and production friction.',
-  'Delivers decision-ready summaries for supervisors, managers, and executives.',
-];
+import type { AboutContent } from '@/lib/landing-content';
 
-export default function About() {
+interface AboutProps {
+  content: AboutContent;
+}
+
+export default function About({ content }: AboutProps) {
   return (
     <section id="platform" className="section section-platform" data-reveal>
       <div className="shell two-col">
         <div>
-          <p className="eyebrow">Platform</p>
-          <h2>Voice-to-data intelligence for complex, fast-moving worksites.</h2>
+          <p className="eyebrow">{content.eyebrow}</p>
+          <h2>{content.title}</h2>
         </div>
         <div className="section-copy">
-          <p>
-            Canary Waves turns live radio communication into operational clarity. Instead of
-            reviewing incidents after the fact, teams get the early signals that help them act
-            sooner.
-          </p>
+          <p>{content.description}</p>
           <ul role="list" className="text-list">
-            {pillars.map((item) => (
+            {content.pillars.map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ul>
