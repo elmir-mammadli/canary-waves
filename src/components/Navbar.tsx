@@ -1,129 +1,148 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
-const navLinks = [
+const links = [
   { label: 'Home', href: '#home' },
-  { label: 'About', href: '#what-it-is' },
-  { label: 'How It Works', href: '#how-it-works' },
-  { label: 'Why Us', href: '#why-us' },
+  { label: 'Platform', href: '#platform' },
+  { label: 'Signals', href: '#signals' },
+  { label: 'Workflow', href: '#workflow' },
   { label: 'Team', href: '#team' },
 ];
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [active, setActive] = useState('home');
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    const observers: IntersectionObserver[] = [];
+    const hasInitialHash = Boolean(window.location.hash);
+
+    if (window.scrollY <= 8 && !hasInitialHash) {
+      setActive('home');
+    }
+
+    links.forEach((link) => {
+      const id = link.href.slice(1);
+      const section = document.getElementById(id);
+      if (!section) return;
+
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (!entry.isIntersecting) return;
+          if (window.scrollY <= 8 && !hasInitialHash && id !== 'home') return;
+          setActive(id);
+        },
+        { threshold: 0.45 }
+      );
+
+      observer.observe(section);
+      observers.push(observer);
+    });
+
+    return () => observers.forEach((observer) => observer.disconnect());
+  }, []);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    const onResize = () => {
+      if (window.innerWidth >= 810) setMenuOpen(false);
+    };
+
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [menuOpen]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    const onEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMenuOpen(false);
+    };
+
+    document.addEventListener('keydown', onEscape);
+    return () => document.removeEventListener('keydown', onEscape);
+  }, [menuOpen]);
+
+  useEffect(() => {
+    document.body.classList.toggle('no-scroll', menuOpen);
+    return () => {
+      document.body.classList.remove('no-scroll');
+    };
+  }, [menuOpen]);
 
   return (
-    <nav
-    className='bg-[#897465]'
-    >
-      <div
-        style={{ maxWidth: '1440px', height: '60px' }}
-        className="mx-auto px-5 flex items-center justify-between"
-      >
-        {/* Logo */}
-        <a href="#home" className="flex items-center no-underline">
-          <img
-            src="/canary_waves_logo.svg"
-            alt="Canary Waves"
-            style={{ height: 'auto', width: '264px' }}
-          />
+    <header className={`site-header ${scrolled ? 'is-scrolled' : ''} ${menuOpen ? 'menu-open' : ''}`}>
+      <nav className="nav-shell" aria-label="Main navigation">
+        <a href="#home" className="nav-logo" aria-label="Canary Waves home">
+          <img src="/canary_waves_logo.svg" alt="Canary Waves" />
         </a>
 
-        {/* Desktop Nav Links */}
-        <ul className="hidden md:flex items-center gap-6 list-none m-0 p-0">
-          {navLinks.map((link) => (
-            <li key={link.label}>
+        <ul className="nav-links" role="list">
+          {links.map((link) => {
+            const sectionId = link.href.slice(1);
+            return (
+              <li key={link.href}>
+                <a className={active === sectionId ? 'is-active' : ''} href={link.href}>
+                  {link.label}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+
+        <a href="#contact" className="nav-cta" data-demo-trigger>
+          Request Demo
+        </a>
+
+        <button
+          type="button"
+          className={`menu-toggle ${menuOpen ? 'is-open' : ''}`}
+          onClick={() => setMenuOpen((value) => !value)}
+          aria-expanded={menuOpen}
+          aria-controls="mobile-nav"
+          aria-label="Toggle menu"
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+      </nav>
+
+      <div
+        className={`mobile-backdrop ${menuOpen ? 'is-open' : ''}`}
+        onClick={() => setMenuOpen(false)}
+        aria-hidden
+      />
+
+      <div id="mobile-nav" className={`mobile-panel ${menuOpen ? 'is-open' : ''}`}>
+        <ul role="list" className="bg-black text-white">
+          {links.map((link) => (
+            <li key={link.href}>
               <a
+                className={active === link.href.slice(1) ? 'is-active' : ''}
                 href={link.href}
-                className='text-white font-light text-base'
-                onMouseEnter={(e) => {
-                  (e.target as HTMLAnchorElement).style.color = '#ffbe56';
-                  (e.target as HTMLAnchorElement).style.textDecoration = 'underline';
-                }}
-                onMouseLeave={(e) => {
-                  (e.target as HTMLAnchorElement).style.color = '#ffffff';
-                  (e.target as HTMLAnchorElement).style.textDecoration = 'none';
-                }}
+                onClick={() => setMenuOpen(false)}
               >
                 {link.label}
               </a>
             </li>
           ))}
+          <li>
+            <a href="#contact" className="mobile-cta text-center" data-demo-trigger onClick={() => setMenuOpen(false)}>
+              Request Demo
+            </a>
+          </li>
         </ul>
-
-        {/* CTA Button */}
-        <a
-          href="#cta"
-          className="hidden md:block shadow-lg"
-          style={{
-            backgroundColor: '#ffbe56',
-            color: '#1f1716',
-            borderRadius: '8px',
-            padding: '8px 16px',
-            fontWeight: 600,
-            fontSize: '16px',
-            textTransform: 'uppercase',
-            letterSpacing: '-0.01em',
-            textDecoration: 'none',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          Request a Demo
-        </a>
-
-        {/* Hamburger */}
-        <button
-          className="md:hidden flex flex-col gap-1.5 p-2"
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle menu"
-          style={{ background: 'none', border: 'none', cursor: 'pointer' }}
-        >
-          <span style={{ display: 'block', width: '24px', height: '2px', backgroundColor: '#fff' }} />
-          <span style={{ display: 'block', width: '24px', height: '2px', backgroundColor: '#fff' }} />
-          <span style={{ display: 'block', width: '24px', height: '2px', backgroundColor: '#fff' }} />
-        </button>
       </div>
-
-      {/* Mobile Menu */}
-      {menuOpen && (
-        <div style={{ backgroundColor: '#897465', borderTop: '1px solid rgba(255,255,255,0.2)' }}>
-          <ul className="flex flex-col p-4 gap-4 list-none m-0">
-            {navLinks.map((link) => (
-              <li key={link.label}>
-                <a
-                  href={link.href}
-                  style={{ color: '#ffffff', fontWeight: 400, fontSize: '16px', textDecoration: 'none' }}
-                  onClick={() => setMenuOpen(false)}
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))}
-            <li>
-              <a
-                href="#cta"
-                onClick={() => setMenuOpen(false)}
-                style={{
-                  display: 'inline-block',
-                  backgroundColor: '#ffbe56',
-                  color: '#1f1716',
-                  borderRadius: '8px',
-                  padding: '12px 16px',
-                  fontWeight: 600,
-                  fontSize: '14px',
-                  textTransform: 'uppercase',
-                  letterSpacing: '-0.01em',
-                  textDecoration: 'none',
-                }}
-              >
-                Request a Demo
-              </a>
-            </li>
-          </ul>
-        </div>
-      )}
-    </nav>
+    </header>
   );
 }
