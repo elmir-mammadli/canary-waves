@@ -1,71 +1,42 @@
-import Image from 'next/image'
+import Image from 'next/image';
 
 export default function Hero() {
   return (
-    <section
-      id="home"
-      style={{
-        backgroundColor: '#c19473',
-        borderBottomLeftRadius: '40px',
-        borderBottomRightRadius: '40px',
-        paddingTop: '80px',
-        paddingBottom: '80px',
-      }}
-    >
-      <div
-        style={{ maxWidth: '1200px' }}
-        className="mx-auto px-5 flex flex-col md:flex-row items-center gap-10"
-      >
-        {/* Left: Text */}
-        <div className="flex flex-col items-center gap-6 flex-1">
-          <h1
-            style={{
-              color: '#ffffff',
-              fontWeight: 700,
-              fontSize: 'clamp(32px, 5vw, 48px)',
-              letterSpacing: '-0.04em',
-              lineHeight: '1em',
-              textAlign: 'center',
-              margin: 0,
-            }}
-          >
-            Transform radio chatter into real-time safety intelligence
-          </h1>
-          <a
-            href="#cta"
-            className='shadow-md'
-            style={{
-              backgroundColor: '#ffbe56',
-              color: '#1f1716',
-              borderRadius: '8px',
-              padding: '9px 16px',
-              fontWeight: 600,
-              fontSize: '16px',
-              textTransform: 'uppercase',
-              letterSpacing: '-0.01em',
-              textDecoration: 'none',
-              display: 'inline-block',
-            }}
-          >
-            Request a Demo
+    <section id="home" className="hero">
+      <Image
+        src="/images/hero.avif"
+        alt="Mining site operations"
+        fill
+        priority
+        sizes="100vw"
+        className="hero-media"
+      />
+      <div className="hero-overlay" />
+
+      <div className="hero-inner">
+        <p className="hero-brand">Canary Waves</p>
+        <h1>
+          Transforming radio chatter
+          <br />
+          into actionable safety intelligence
+        </h1>
+        <p className="hero-copy">
+          Built for high-risk industrial operations where every message can prevent the next
+          incident.
+        </p>
+        <div className="hero-actions">
+          <a href="#contact" className="btn btn-gold" data-demo-trigger>
+            Request a demo
+          </a>
+          <a href="#signals" className="btn btn-ghost">
+            Explore platform
           </a>
         </div>
-
-        {/* Right: Image Placeholder */}
-        <div className="flex-1 flex justify-center">
-          <Image
-            src="/images/hero.avif"
-            alt="Hero"
-            width={546}
-            height={364}
-            style={{
-              width: '100%',
-              maxWidth: '546px',
-              borderRadius: '40px',
-              boxShadow: '0 8px 40px rgba(0,0,0,0.2)',
-            }}
-          />
-        </div>
+        <ul className="hero-notes" role="list">
+          <li>No new radio hardware required</li>
+          <li>Passive capture and analysis of existing comms</li>
+          <li>Structured alerts for ops and safety leaders</li>
+        </ul>
       </div>
     </section>
   );
