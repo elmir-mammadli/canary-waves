@@ -14,6 +14,21 @@ This project reads editable section content from Strapi for:
 
 ---
 
+## 0) Monorepo Layout
+
+This repository now contains:
+
+- `./` -> Next.js frontend
+- `./cms` -> Strapi backend
+
+Start CMS locally:
+
+```bash
+npm run dev:cms
+```
+
+---
+
 ## 1) Environment Variables
 
 Create `.env.local` from `.env.example`:
@@ -130,3 +145,20 @@ npm run dev
 ```
 
 The frontend automatically falls back to local default content if Strapi is unavailable.
+
+---
+
+## 6) Strapi Cloud (Monorepo)
+
+When deploying `cms` to Strapi Cloud from this same repo:
+
+1. Choose this GitHub repository.
+2. Click **Show more**.
+3. Set **Base directory / Project directory** to:
+
+```text
+cms
+```
+
+Without that, Strapi Cloud checks repo root and shows:
+`Strapi was not found in the project dependencies`.

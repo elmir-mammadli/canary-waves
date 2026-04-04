@@ -4,7 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:web": "next dev",
+    "dev:cms": "npm run develop --prefix cms",
+    "dev:all": "npm run dev:web & npm run dev:cms",
     "build": "next build",
+    "build:web": "next build",
+    "build:cms": "npm run build --prefix cms",
     "start": "next start"
   },
   "dependencies": {

@@ -36,6 +36,18 @@ Built with [Next.js 14](https://nextjs.org/), [React 18](https://react.dev/), [T
 npm install
 ```
 
+Install CMS dependencies (already scaffolded in `cms/`):
+
+```bash
+npm install --prefix cms
+```
+
+If you need to recreate the Strapi app from scratch:
+
+```bash
+npx create-strapi-app@latest cms --ts --use-npm --install --skip-cloud --no-run --non-interactive
+```
+
 ### Dev server
 
 ```bash
@@ -43,6 +55,18 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+Run Strapi CMS locally:
+
+```bash
+npm run dev:cms
+```
+
+Run both web and CMS together:
+
+```bash
+npm run dev:all
+```
 
 ### Strapi CMS
 

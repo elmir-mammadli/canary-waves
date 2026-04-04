@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_shared_workflow_steps",
+  "info": {
+    "displayName": "Workflow Step",
+    "description": "Step inside workflow timeline"
+  },
+  "attributes": {
+    "step": {
+      "type": "string",
+      "required": true
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text",
+      "required": true
+    }
+  }
+}

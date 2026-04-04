@@ -1,0 +1,26 @@
+{
+  "collectionName": "components_shared_feature_items",
+  "info": {
+    "displayName": "Feature Item",
+    "description": "Feature card-style content with image"
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "summary": {
+      "type": "text",
+      "required": true
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"],
+      "required": true
+    },
+    "imageAlt": {
+      "type": "string"
+    }
+  }
+}

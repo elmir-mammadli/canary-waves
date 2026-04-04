@@ -1,0 +1,23 @@
+{
+  "kind": "singleType",
+  "collectionName": "workflow_sections",
+  "info": {
+    "singularName": "workflow-section",
+    "pluralName": "workflow-sections",
+    "displayName": "Workflow Section"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "eyebrow": { "type": "string" },
+    "title": { "type": "text", "required": true },
+    "ctaLabel": { "type": "string" },
+    "steps": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.workflow-step"
+    }
+  }
+}
