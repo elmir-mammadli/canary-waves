@@ -2,175 +2,143 @@
 
 import { useState } from 'react';
 
-const inputStyle: React.CSSProperties = {
-  backgroundColor: 'rgba(187,187,187,0.15)',
-  border: '1px solid rgba(136,136,136,0.1)',
-  borderRadius: '10px',
-  padding: '12px',
-  color: '#ffffff',
-  fontFamily: 'inherit',
-  fontWeight: 400,
-  fontSize: '14px',
-  height: '40px',
-  width: '100%',
-  outline: 'none',
-};
+interface FormValues {
+  name: string;
+  company: string;
+  email: string;
+  message: string;
+}
 
-const labelStyle: React.CSSProperties = {
-  fontWeight: 500,
-  fontSize: '12px',
-  color: '#f4ebda',
-  display: 'block',
-  marginBottom: '4px',
+interface FormErrors {
+  name?: string;
+  company?: string;
+  email?: string;
+}
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function validate(values: FormValues): FormErrors {
+  const errors: FormErrors = {};
+  if (!values.name.trim()) errors.name = 'Name is required.';
+  if (!values.company.trim()) errors.company = 'Company is required.';
+  if (!values.email.trim()) errors.email = 'Email is required.';
+  if (values.email.trim() && !emailRegex.test(values.email)) errors.email = 'Enter a valid email.';
+  return errors;
+}
+
+const initialValues: FormValues = {
+  name: '',
+  company: '',
+  email: '',
+  message: '',
 };
 
 export default function CTAForm() {
+  const [values, setValues] = useState<FormValues>(initialValues);
+  const [errors, setErrors] = useState<FormErrors>({});
   const [agreed, setAgreed] = useState(false);
-  const [focusedField, setFocusedField] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
 
-  const getFocusStyle = (field: string): React.CSSProperties =>
-    focusedField === field
-      ? { ...inputStyle, border: '1px solid #ffbe56' }
-      : inputStyle;
+  const onFieldChange =
+    (field: keyof FormValues) => (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const value = event.target.value;
+      setValues((current) => ({ ...current, [field]: value }));
+      if (errors[field as keyof FormErrors]) {
+        setErrors((current) => ({ ...current, [field]: undefined }));
+      }
+    };
+
+  const onSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    const validation = validate(values);
+    setErrors(validation);
+    if (Object.keys(validation).length === 0 && agreed) {
+      setSubmitted(true);
+    }
+  };
 
   return (
-    <section
-      id="cta"
-      style={{
-        backgroundColor: '#4e7b7c',
-        borderRadius: '40px',
-        paddingTop: '160px',
-        paddingBottom: '160px',
-        paddingLeft: '20px',
-        paddingRight: '20px',
-        margin: '0 16px',
-      }}
-    >
-      <div
-        style={{ maxWidth: '1200px' }}
-        className="mx-auto flex flex-col md:flex-row gap-12 items-center"
-      >
-        {/* Left */}
-        <div className="flex-1 flex flex-col items-center gap-4 text-center">
-          {/* Bird icon */}
-          <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="30" cy="30" r="30" fill="#ffbe56" opacity="0.2"/>
-            <path d="M15 38 C20 26, 28 22, 36 30 C40 34, 46 32, 46 27" stroke="#ffbe56" strokeWidth="3" strokeLinecap="round" fill="none"/>
-            <circle cx="15" cy="38" r="4" fill="#ffbe56"/>
-            <path d="M46 27 L50 24 L48 30 Z" fill="#ffbe56"/>
-          </svg>
-
-          <h2
-            style={{
-              color: '#ffffff',
-              fontWeight: 700,
-              fontSize: 'clamp(28px, 4vw, 40px)',
-              letterSpacing: '-0.04em',
-              margin: 0,
-              textAlign: 'center',
-            }}
-          >
-            Ready to transform safety?
-          </h2>
-          <p
-            style={{
-              color: '#ffffff',
-              fontWeight: 400,
-              fontSize: '16px',
-              margin: 0,
-              textAlign: 'center',
-            }}
-          >
-            Book a demo and see Canary Waves in action.
+    <section id="contact" className="section section-cta" data-reveal>
+      <div className="shell cta-layout">
+        <div className="cta-copy">
+          <p className="eyebrow light">Contact</p>
+          <h2>Ready to see what your radio traffic is trying to tell you?</h2>
+          <p>
+            Book a walkthrough and we will map Canary Waves to your current environment, safety
+            goals, and reporting workflow.
           </p>
         </div>
 
-        {/* Right: Form */}
-        <div className="flex-1 w-full" style={{ maxWidth: '557px' }}>
-          <form className="flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
-            <div>
-              <label style={labelStyle} htmlFor="cta-name">Name</label>
-              <input
-                id="cta-name"
-                type="text"
-                placeholder="Jane Smith"
-                style={getFocusStyle('name')}
-                onFocus={() => setFocusedField('name')}
-                onBlur={() => setFocusedField(null)}
-              />
+        <div className="cta-form-wrap">
+          {submitted ? (
+            <div className="form-success" role="status" aria-live="polite">
+              <h3>You&apos;re on the list.</h3>
+              <p>Thanks for reaching out. Our team will contact you within one business day.</p>
             </div>
-            <div>
-              <label style={labelStyle} htmlFor="cta-company">Company</label>
-              <input
-                id="cta-company"
-                type="text"
-                placeholder="Canary Waves"
-                style={getFocusStyle('company')}
-                onFocus={() => setFocusedField('company')}
-                onBlur={() => setFocusedField(null)}
-              />
-            </div>
-            <div>
-              <label style={labelStyle} htmlFor="cta-email">Email</label>
-              <input
-                id="cta-email"
-                type="email"
-                placeholder="jane@canarywaves.com"
-                style={getFocusStyle('email')}
-                onFocus={() => setFocusedField('email')}
-                onBlur={() => setFocusedField(null)}
-              />
-            </div>
-            <div>
-              <label style={labelStyle} htmlFor="cta-message">Message</label>
-              <textarea
-                id="cta-message"
-                placeholder="Hey! ..."
-                style={{
-                  ...getFocusStyle('message'),
-                  height: 'auto',
-                  minHeight: '100px',
-                  resize: 'vertical',
-                }}
-                onFocus={() => setFocusedField('message')}
-                onBlur={() => setFocusedField(null)}
-              />
-            </div>
-            <div className="flex items-center gap-3">
-              <input
-                id="cta-terms"
-                type="checkbox"
-                checked={agreed}
-                onChange={(e) => setAgreed(e.target.checked)}
-                style={{ width: '16px', height: '16px', accentColor: '#ffbe56', flexShrink: 0 }}
-              />
-              <label
-                htmlFor="cta-terms"
-                style={{ ...labelStyle, margin: 0, cursor: 'pointer' }}
-              >
-                Agree to Terms and Conditions
+          ) : (
+            <form onSubmit={onSubmit} noValidate className="cta-form">
+              <label htmlFor="name">
+                Name
+                <input
+                  id="name"
+                  type="text"
+                  value={values.name}
+                  placeholder="Jane Smith"
+                  onChange={onFieldChange('name')}
+                />
+                {errors.name && <span className="form-error">{errors.name}</span>}
               </label>
-            </div>
-            <button
-              type="submit"
-              style={{
-                backgroundColor: '#ffbe56',
-                color: '#1f1716',
-                height: '40px',
-                borderRadius: '10px',
-                fontFamily: 'inherit',
-                fontWeight: 600,
-                fontSize: '14px',
-                textTransform: 'uppercase',
-                letterSpacing: '-0.01em',
-                border: 'none',
-                cursor: 'pointer',
-                width: '100%',
-              }}
-            >
-              Request a demo
-            </button>
-          </form>
+
+              <label htmlFor="company">
+                Company
+                <input
+                  id="company"
+                  type="text"
+                  value={values.company}
+                  placeholder="Canary Waves"
+                  onChange={onFieldChange('company')}
+                />
+                {errors.company && <span className="form-error">{errors.company}</span>}
+              </label>
+
+              <label htmlFor="email">
+                Email
+                <input
+                  id="email"
+                  type="email"
+                  value={values.email}
+                  placeholder="jane@company.com"
+                  onChange={onFieldChange('email')}
+                />
+                {errors.email && <span className="form-error">{errors.email}</span>}
+              </label>
+
+              <label htmlFor="message">
+                Message (optional)
+                <textarea
+                  id="message"
+                  rows={4}
+                  value={values.message}
+                  placeholder="Tell us about your site, team size, or current tools."
+                  onChange={onFieldChange('message')}
+                />
+              </label>
+
+              <label className="check-row" htmlFor="agree">
+                <input
+                  id="agree"
+                  type="checkbox"
+                  checked={agreed}
+                  onChange={(event) => setAgreed(event.target.checked)}
+                />
+                <span>I agree to receive communication about Canary Waves.</span>
+              </label>
+
+              <button type="submit" className="btn btn-gold">
+                Request demo
+              </button>
+            </form>
+          )}
         </div>
       </div>
     </section>
