@@ -11,13 +11,21 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "eyebrow": { "type": "string" },
-    "title": { "type": "text", "required": true },
-    "description": { "type": "text", "required": true },
+    "eyebrow": {
+      "type": "string"
+    },
+    "title": {
+      "type": "text",
+      "required": true
+    },
+    "description": {
+      "type": "blocks",
+      "required": true
+    },
     "members": {
       "type": "component",
-      "repeatable": true,
-      "component": "shared.team-member"
+      "component": "shared.team-member",
+      "repeatable": true
     }
   }
 }

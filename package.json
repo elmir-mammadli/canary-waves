@@ -7,6 +7,7 @@
     "dev:web": "next dev",
     "dev:cms": "npm run develop --prefix cms",
     "dev:all": "npm run dev:web & npm run dev:cms",
+    "repair:cms": "npm rebuild better-sqlite3 --prefix cms",
     "build": "next build",
     "build:web": "next build",
     "build:cms": "npm run build --prefix cms",

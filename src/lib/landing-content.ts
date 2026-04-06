@@ -1,3 +1,29 @@
+export interface StrapiRichTextTextNode {
+  type: 'text';
+  text?: string;
+  bold?: boolean;
+  italic?: boolean;
+  underline?: boolean;
+  strikethrough?: boolean;
+  code?: boolean;
+}
+
+export interface StrapiRichTextNode {
+  type?: string;
+  level?: number;
+  format?: 'ordered' | 'unordered';
+  url?: string;
+  children?: Array<StrapiRichTextNode | StrapiRichTextTextNode>;
+  text?: string;
+  bold?: boolean;
+  italic?: boolean;
+  underline?: boolean;
+  strikethrough?: boolean;
+  code?: boolean;
+}
+
+export type CmsText = string | StrapiRichTextNode[];
+
 export interface HeroContent {
   brand: string;
   heading: string;
@@ -12,13 +38,14 @@ export interface HeroContent {
 export interface AboutContent {
   eyebrow: string;
   title: string;
-  description: string;
+  description: CmsText;
   pillars: string[];
 }
 
 export interface FeatureItem {
   title: string;
-  summary: string;
+  subtitle?: string;
+  summary: CmsText;
   imageUrl: string;
   imageAlt: string;
 }
@@ -32,7 +59,7 @@ export interface FeaturesContent {
 export interface WorkflowStep {
   step: string;
   title: string;
-  description: string;
+  description: CmsText;
 }
 
 export interface WorkflowContent {
@@ -44,7 +71,7 @@ export interface WorkflowContent {
 
 export interface WhyUsItem {
   title: string;
-  description: string;
+  description: CmsText;
   imageUrl: string;
   imageAlt: string;
 }
@@ -53,6 +80,19 @@ export interface WhyUsContent {
   eyebrow: string;
   title: string;
   items: WhyUsItem[];
+}
+
+export interface ImpactStat {
+  value: number;
+  suffix: string;
+  label: string;
+}
+
+export interface ImpactContent {
+  title: string;
+  description: CmsText;
+  caption: CmsText;
+  stats: ImpactStat[];
 }
 
 export interface TeamMember {
@@ -65,13 +105,13 @@ export interface TeamMember {
 export interface TeamContent {
   eyebrow: string;
   title: string;
-  description: string;
+  description: CmsText;
   members: TeamMember[];
 }
 
 export interface FAQItem {
   question: string;
-  answer: string;
+  answer: CmsText;
 }
 
 export interface FAQContent {
@@ -86,6 +126,7 @@ export interface LandingPageContent {
   features: FeaturesContent;
   workflow: WorkflowContent;
   whyUs: WhyUsContent;
+  impact: ImpactContent;
   team: TeamContent;
   faq: FAQContent;
 }
@@ -123,6 +164,7 @@ export const defaultLandingPageContent: LandingPageContent = {
     items: [
       {
         title: 'Equipment Communication and Collision Prevention',
+        subtitle: 'No More Metal-on-Metal.',
         summary:
           'Surface unsafe pass communication patterns before they turn into metal-on-metal incidents.',
         imageUrl: '/images/feature-1.avif',
@@ -130,6 +172,7 @@ export const defaultLandingPageContent: LandingPageContent = {
       },
       {
         title: 'Hazard Identification and Mitigation Tracking',
+        subtitle: 'Spot Risks Before They Escalate.',
         summary:
           'Capture hazard mentions and follow-up actions so mitigation is visible, auditable, and timely.',
         imageUrl: '/images/feature-2.avif',
@@ -137,6 +180,7 @@ export const defaultLandingPageContent: LandingPageContent = {
       },
       {
         title: 'Contractor Oversight and KPI Confidence',
+        subtitle: 'See Performance With Proof.',
         summary:
           'Measure contract delivery and frontline execution through real communication, not assumptions.',
         imageUrl: '/images/feature-3.avif',
@@ -195,11 +239,35 @@ export const defaultLandingPageContent: LandingPageContent = {
       },
     ],
   },
+  impact: {
+    title: 'Incident prevention levels enabled by real-time audio analysis',
+    description:
+      'Intelligence analysis of radio conversations helps detect early warning signs before they turn into actual accidents.',
+    caption:
+      'Percentage of incidents prevented according to the type of risk detected in advance by Canary Waves system.',
+    stats: [
+      {
+        value: 25,
+        suffix: '%',
+        label: 'Misuse of heavy machinery',
+      },
+      {
+        value: 50,
+        suffix: '%',
+        label: 'Operational communication errors',
+      },
+      {
+        value: 75,
+        suffix: '%',
+        label: 'Safety protocol violations',
+      },
+    ],
+  },
   team: {
     eyebrow: 'Team',
     title: 'Built by operators and builders focused on preventable risk.',
     description:
-      'Canary Waves exists to close the gap between what frontline teams say in the moment and what decision makers can actually act on. We believe AI should reduce harm, increase accountability, and make every shift safer.',
+      'Canary Waves exists to closessssss the gap between what frontline teams say in the moment and what decision makers can actually act on. We believe AI should reduce harm, increase accountability, and make every shift safer.',
     members: [
       {
         name: 'Jack Kellner',

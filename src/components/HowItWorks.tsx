@@ -1,4 +1,5 @@
 import type { WorkflowContent } from '@/lib/landing-content';
+import CmsRichText from '@/components/CmsRichText';
 
 interface HowItWorksProps {
   content: WorkflowContent;
@@ -16,7 +17,7 @@ export default function HowItWorks({ content }: HowItWorksProps) {
             <li key={step.step}>
               <span className="timeline-step">{step.step}</span>
               <h3>{step.title}</h3>
-              <p>{step.description}</p>
+              <CmsRichText value={step.description} className="timeline-richtext" />
             </li>
           ))}
         </ol>

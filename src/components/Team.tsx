@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import type { TeamContent } from '@/lib/landing-content';
+import CmsRichText from '@/components/CmsRichText';
 
 interface TeamProps {
   content: TeamContent;
@@ -12,12 +13,12 @@ export default function Team({ content }: TeamProps) {
         <div className="team-intro">
           <p className="eyebrow">{content.eyebrow}</p>
           <h2>{content.title}</h2>
-          <p>{content.description}</p>
+          <CmsRichText value={content.description} className="team-richtext" />
         </div>
 
         <div className="team-grid">
-          {content.members.map((founder) => (
-            <article key={founder.name} className="team-member">
+          {content.members.map((founder, index) => (
+            <article key={`${founder.name}-${index}`} className="team-member">
               <Image
                 src={founder.imageUrl}
                 alt={founder.imageAlt}

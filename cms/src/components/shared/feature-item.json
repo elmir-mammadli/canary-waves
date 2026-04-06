@@ -9,6 +9,9 @@
       "type": "string",
       "required": true
     },
+    "subtitle": {
+      "type": "string"
+    },
     "summary": {
       "type": "text",
       "required": true

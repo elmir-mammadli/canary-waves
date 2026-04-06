@@ -7,6 +7,7 @@ This project reads editable section content from Strapi for:
 - Signals (Features)
 - Workflow
 - Why Us
+- Impact
 - Team
 - FAQ
 
@@ -41,6 +42,30 @@ Set:
 
 - `NEXT_PUBLIC_STRAPI_URL` (example: `http://localhost:1337`)
 - `STRAPI_API_TOKEN` (optional but recommended for production)
+- `STRAPI_CONTENT_STATUS` (`published` or `draft`)
+- `STRAPI_REVALIDATE` (seconds, use `0` for no-store)
+- `STRAPI_FAIL_ON_ERROR` (`true` to fail loudly when CMS fetch fails)
+
+Defaults if not set:
+
+- Development: `draft` + `no-store` + `fallback allowed`
+- Production: `published` + `60s revalidate` + `fallback allowed`
+
+Recommended for local content editing:
+
+```env
+STRAPI_CONTENT_STATUS=draft
+STRAPI_REVALIDATE=0
+STRAPI_FAIL_ON_ERROR=false
+```
+
+Recommended for production:
+
+```env
+STRAPI_CONTENT_STATUS=published
+STRAPI_REVALIDATE=60
+STRAPI_FAIL_ON_ERROR=false
+```
 
 ---
 
@@ -71,6 +96,11 @@ Create these reusable components in Strapi:
 5. `shared.faq-item`
 - `question` (Text)
 - `answer` (Text)
+
+6. `shared.stat-item`
+- `value` (Number)
+- `suffix` (Text, default `%`)
+- `label` (Text)
 
 ---
 
@@ -115,7 +145,13 @@ Create these Single Types with exact API IDs:
 - `description` (Text)
 - `members` (Repeatable component: `shared.team-member`)
 
-7. `faq-section`
+7. `impact-section`
+- `title` (Text)
+- `description` (Text)
+- `caption` (Text, optional)
+- `stats` (Repeatable component: `shared.stat-item`)
+
+8. `faq-section`
 - `eyebrow` (Text)
 - `title` (Text)
 - `items` (Repeatable component: `shared.faq-item`)
@@ -144,7 +180,22 @@ After changing env vars:
 npm run dev
 ```
 
-The frontend automatically falls back to local default content if Strapi is unavailable.
+The frontend falls back to local default content if Strapi is unavailable.
+Set `STRAPI_FAIL_ON_ERROR=true` only when you explicitly want hard failures for debugging.
+
+If the frontend keeps showing `landing-content.ts` values, the usual cause is that Strapi is not
+actually running at `http://localhost:1337`. In that case the frontend cannot fetch CMS data and
+falls back by design.
+
+Common local fix when Strapi fails to boot after a Node version change:
+
+```bash
+npm run repair:cms
+npm run dev:cms
+```
+
+If you set `STRAPI_REVALIDATE`, use a plain number of seconds such as `60`.
+`60s` is now also accepted by the frontend parser.
 
 ---
 

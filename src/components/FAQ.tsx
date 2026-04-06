@@ -1,13 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import type { FAQContent } from '@/lib/landing-content';
+import type { CmsText, FAQContent } from '@/lib/landing-content';
+import CmsRichText from '@/components/CmsRichText';
 
 interface FAQProps {
   content: FAQContent;
 }
 
-function FAQItem({ question, answer }: { question: string; answer: string }) {
+function FAQItem({ question, answer }: { question: string; answer: CmsText }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -17,7 +18,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
         <span aria-hidden>{open ? '−' : '+'}</span>
       </button>
       <div className="faq-answer">
-        <p>{answer}</p>
+        <CmsRichText value={answer} className="faq-richtext" />
       </div>
     </article>
   );

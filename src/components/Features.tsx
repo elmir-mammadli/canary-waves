@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import type { FeaturesContent } from '@/lib/landing-content';
+import CmsRichText from '@/components/CmsRichText';
 
 interface FeaturesProps {
   content: FeaturesContent;
@@ -29,7 +30,8 @@ export default function Features({ content }: FeaturesProps) {
               </div>
               <div className="feature-text">
                 <h3>{feature.title}</h3>
-                <p>{feature.summary}</p>
+                {feature.subtitle ? <p className="feature-subtitle">{feature.subtitle}</p> : null}
+                <CmsRichText value={feature.summary} className="feature-richtext" />
               </div>
             </article>
           ))}

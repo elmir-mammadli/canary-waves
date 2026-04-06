@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_shared_stat_items",
+  "info": {
+    "displayName": "Stat Item",
+    "description": "Animated impact stat"
+  },
+  "attributes": {
+    "value": {
+      "type": "integer",
+      "required": true
+    },
+    "suffix": {
+      "type": "string",
+      "default": "%"
+    },
+    "label": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

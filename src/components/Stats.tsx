@@ -1,161 +1,180 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import CmsRichText from '@/components/CmsRichText';
+import type { ImpactContent } from '@/lib/landing-content';
 
-const stats = [
-  { target: 0, label: 'Misuse of heavy machinery' },
-  { target: 25, label: 'Operational communication errors' },
-  { target: 50, label: 'Safety protocol violations' },
+interface StatsProps {
+  content: ImpactContent;
+}
+
+interface RingConfig {
+  radius: number;
+  startAngle: number;
+  endAngle: number;
+  delay: number;
+}
+
+const RING_CONFIG: RingConfig[] = [
+  { radius: 210, startAngle: 350, endAngle: 450, delay: 0 },
+  { radius: 148, startAngle: 248, endAngle: 450, delay: 120 },
+  { radius: 92, startAngle: 158, endAngle: 450, delay: 240 },
 ];
+
+const GRAPH_CENTER_X = 280;
+const GRAPH_CENTER_Y = 286;
+
+const POSITION_CLASSES = ['impact-stat-top', 'impact-stat-left', 'impact-stat-bottom'] as const;
 
 function easeOutCubic(t: number): number {
   return 1 - Math.pow(1 - t, 3);
 }
 
-function CountUp({ target, triggered }: { target: number; triggered: boolean }) {
+function polarToCartesian(centerX: number, centerY: number, radius: number, angle: number) {
+  const radians = ((angle - 90) * Math.PI) / 180;
+  return {
+    x: centerX + radius * Math.cos(radians),
+    y: centerY + radius * Math.sin(radians),
+  };
+}
+
+function describeArc(centerX: number, centerY: number, radius: number, startAngle: number, endAngle: number) {
+  const start = polarToCartesian(centerX, centerY, radius, endAngle);
+  const end = polarToCartesian(centerX, centerY, radius, startAngle);
+  const largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1';
+
+  return `M ${start.x} ${start.y} A ${radius} ${radius} 0 ${largeArcFlag} 0 ${end.x} ${end.y}`;
+}
+
+function getStatAnchor(index: number) {
+  const ring = RING_CONFIG[index];
+  const endpoint = polarToCartesian(GRAPH_CENTER_X, GRAPH_CENTER_Y, ring.radius, ring.startAngle);
+
+  return {
+    left: `${(endpoint.x / 560) * 100}%`,
+    top: `${(endpoint.y / 520) * 100}%`,
+  };
+}
+
+function CountUpValue({
+  value,
+  suffix,
+  active,
+}: {
+  value: number;
+  suffix: string;
+  active: boolean;
+}) {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
-    if (!triggered) return;
-    if (target === 0) {
-      setCount(0);
+    if (!active) return;
+
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setCount(value);
       return;
     }
-    const duration = 1200;
-    const start = performance.now();
-    const step = (now: number) => {
-      const elapsed = now - start;
-      const progress = Math.min(elapsed / duration, 1);
-      setCount(Math.round(easeOutCubic(progress) * target));
-      if (progress < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  }, [triggered, target]);
 
-  return <>{count}%</>;
+    const duration = 1400;
+    const startTime = performance.now();
+    let frameId = 0;
+
+    const tick = (now: number) => {
+      const progress = Math.min((now - startTime) / duration, 1);
+      setCount(Math.round(easeOutCubic(progress) * value));
+      if (progress < 1) frameId = window.requestAnimationFrame(tick);
+    };
+
+    frameId = window.requestAnimationFrame(tick);
+    return () => window.cancelAnimationFrame(frameId);
+  }, [active, value]);
+
+  return (
+    <>
+      {count}
+      {suffix}
+    </>
+  );
 }
 
-export default function Stats() {
-  const [triggered, setTriggered] = useState(false);
+export default function Stats({ content }: StatsProps) {
   const sectionRef = useRef<HTMLElement>(null);
+  const [active, setActive] = useState(false);
+  const primaryStats = content.stats.slice(0, 3);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setTriggered(true); },
-      { threshold: 0.3 }
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setActive(true);
+          observer.disconnect();
+        }
+      },
+      {
+        threshold: 0.35,
+      }
     );
-    if (sectionRef.current) observer.observe(sectionRef.current);
+
+    const current = sectionRef.current;
+    if (current) observer.observe(current);
+
     return () => observer.disconnect();
   }, []);
 
   return (
-    <section
-      ref={sectionRef}
-      data-reveal
-      style={{
-        backgroundColor: '#f4ebda',
-        paddingTop: '80px',
-        paddingBottom: '80px',
-        paddingLeft: '20px',
-        paddingRight: '20px',
-      }}
-    >
-      <div
-        style={{
-          maxWidth: '1200px',
-          borderRadius: '40px',
-          backgroundColor: '#f4ebda',
-        }}
-        className="mx-auto"
-      >
-        <div className="flex flex-col md:flex-row gap-10 items-start">
-          {/* Left: Chart image + caption */}
-          <div className="flex flex-col gap-4" style={{ flex: '1' }}>
-            <div
-              style={{
-                width: '100%',
-                maxWidth: '540px',
-                aspectRatio: '540/466',
-                backgroundColor: '#d4b896',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <span style={{ color: '#9c5230', fontWeight: 500, fontSize: '14px' }}>
-                Stats Image (Bar Chart)
-              </span>
-            </div>
-            <p
-              style={{
-                color: '#1f1716',
-                fontWeight: 400,
-                fontSize: '14px',
-                margin: 0,
-                lineHeight: '1.5em',
-                maxWidth: '540px',
-              }}
-            >
-              Percentage of incidents prevented according to the type of risk detected in advance
-              by Canary Waves system.
-            </p>
-          </div>
-
-          {/* Right: Text + stats */}
-          <div
-            className="flex flex-col gap-6"
-            style={{ flex: '1', maxWidth: '432px' }}
-          >
-            <h3
-              style={{
-                color: '#9c5230',
-                fontWeight: 600,
-                fontSize: 'clamp(20px, 2.5vw, 28px)',
-                margin: 0,
-                textAlign: 'left',
-              }}
-            >
-              Incident prevention levels enabled by real-time audio analysis
-            </h3>
-            <p
-              style={{
-                color: '#1f1716',
-                fontWeight: 400,
-                fontSize: '16px',
-                margin: 0,
-                lineHeight: '1.5em',
-              }}
-            >
-              Intelligence analysis of radio conversations helps detect early warning signs before
-              they turn into actual accidents.
-            </p>
-
-            <div className="flex flex-col gap-6">
-              {stats.map((stat) => (
-                <div key={stat.label} className="flex flex-col gap-1">
-                  <span
-                    style={{
-                      color: '#1f1716',
-                      fontWeight: 700,
-                      fontSize: '72px',
-                      lineHeight: '1em',
-                    }}
-                  >
-                    <CountUp target={stat.target} triggered={triggered} />
-                  </span>
-                  <span
-                    style={{
-                      color: '#897465',
-                      fontWeight: 400,
-                      fontSize: '16px',
-                    }}
-                  >
-                    {stat.label}
-                  </span>
-                </div>
+    <section ref={sectionRef} className="section section-impact" data-reveal>
+      <div className="shell impact-layout">
+        <div className="impact-visual-column">
+          <div className="impact-visual">
+            <div className="impact-core" aria-hidden="true" />
+            <svg className="impact-rings" viewBox="0 0 560 520" aria-hidden="true">
+              {RING_CONFIG.map((ring, index) => (
+                <path
+                  key={`impact-ring-${index}`}
+                  d={describeArc(GRAPH_CENTER_X, GRAPH_CENTER_Y, ring.radius, ring.startAngle, ring.endAngle)}
+                  className="impact-ring"
+                  pathLength={100}
+                  style={{
+                    strokeDasharray: 100,
+                    strokeDashoffset: active ? 0 : 100,
+                    transitionDelay: `${ring.delay}ms`,
+                  }}
+                />
               ))}
-            </div>
+            </svg>
+
+            {primaryStats.map((stat, index) => (
+              <div
+                key={`${stat.label}-${index}`}
+                className={['impact-stat', POSITION_CLASSES[index] ?? ''].filter(Boolean).join(' ')}
+                style={getStatAnchor(index)}
+              >
+                <div
+                  className={
+                    [
+                      index === 0 ? 'relative -left-30' : '',
+                      index === 1 ? 'relative top-22' : '',
+                      index === 2 ?  'relative left-10': ''
+                    ]
+                      .filter(Boolean)
+                      .join(' ')
+                  }
+                >
+                <p className="impact-value">
+                  <CountUpValue value={stat.value} suffix={stat.suffix} active={active} />
+                </p>
+                <p className="impact-label">{stat.label}</p>
+                </div>
+              </div>
+            ))}
           </div>
+
+          <CmsRichText value={content.caption} className="impact-caption" />
+        </div>
+
+        <div className="impact-copy">
+          <h2 className="impact-title">{content.title}</h2>
+          <CmsRichText value={content.description} className="impact-description" />
         </div>
       </div>
     </section>
