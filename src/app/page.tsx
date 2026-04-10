@@ -16,6 +16,10 @@ export const revalidate = 10;
 
 export default async function Home() {
   const content = await getLandingPageContent();
+  // You won't see this in your browser's developer console because 
+  // this code runs on the server (in Next.js's server components).
+  // To see this log, check your terminal where the Next.js server runs.
+  console.log('test pull req', content.hero);
 
   return (
     <>

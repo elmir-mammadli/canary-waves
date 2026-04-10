@@ -11,6 +11,16 @@ if (strapiUrl) {
       port: parsed.port,
       pathname: '/uploads/**',
     });
+
+    if (parsed.hostname.endsWith('.strapiapp.com')) {
+      const mediaHostname = parsed.hostname.replace('.strapiapp.com', '.media.strapiapp.com');
+      remotePatterns.push({
+        protocol: parsed.protocol.replace(':', ''),
+        hostname: mediaHostname,
+        port: parsed.port,
+        pathname: '/**',
+      });
+    }
   } catch {
     // Invalid URL should not block app startup.
   }
