@@ -13,7 +13,7 @@
   "attributes": {
     "eyebrow": { "type": "string" },
     "title": { "type": "text", "required": true },
-    "description": { "type": "text", "required": true },
+    "description": { "type": "blocks", "required": true },
     "pillars": {
       "type": "component",
       "repeatable": true,
