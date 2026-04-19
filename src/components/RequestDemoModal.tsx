@@ -1,45 +1,22 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-
-interface FormValues {
-  name: string;
-  company: string;
-  email: string;
-  message: string;
-}
-
-interface FormErrors {
-  name?: string;
-  company?: string;
-  email?: string;
-}
-
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-const initialValues: FormValues = {
-  name: '',
-  company: '',
-  email: '',
-  message: '',
-};
-
-function validate(values: FormValues): FormErrors {
-  const errors: FormErrors = {};
-  if (!values.name.trim()) errors.name = 'Name is required.';
-  if (!values.company.trim()) errors.company = 'Company is required.';
-  if (!values.email.trim()) errors.email = 'Email is required.';
-  if (values.email.trim() && !emailRegex.test(values.email)) errors.email = 'Enter a valid email.';
-  return errors;
-}
+import {
+  type ContactFormErrors,
+  initialContactFormValues,
+  submitContactForm,
+  validateContactForm,
+} from '@/lib/contact-form';
 
 export default function RequestDemoModal() {
   const [isMounted, setIsMounted] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const [values, setValues] = useState<FormValues>(initialValues);
-  const [errors, setErrors] = useState<FormErrors>({});
+  const [values, setValues] = useState(initialContactFormValues);
+  const [errors, setErrors] = useState<ContactFormErrors>({});
   const [agreed, setAgreed] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
   const firstInputRef = useRef<HTMLInputElement>(null);
   const closeTimeoutRef = useRef<number | null>(null);
 
@@ -106,20 +83,34 @@ export default function RequestDemoModal() {
   }, []);
 
   const onFieldChange =
-    (field: keyof FormValues) => (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    (field: keyof typeof initialContactFormValues) =>
+    (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const value = event.target.value;
       setValues((current) => ({ ...current, [field]: value }));
-      if (errors[field as keyof FormErrors]) {
+      if (field !== 'message' && errors[field]) {
         setErrors((current) => ({ ...current, [field]: undefined }));
       }
+      if (submitError) setSubmitError('');
     };
 
-  const onSubmit = (event: React.FormEvent) => {
+  const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    const validation = validate(values);
+    const validation = validateContactForm(values, agreed);
     setErrors(validation);
-    if (Object.keys(validation).length === 0 && agreed) {
+    if (Object.keys(validation).length > 0) return;
+
+    setIsSubmitting(true);
+    setSubmitError('');
+
+    try {
+      await submitContactForm(values, { source: 'request-demo-modal' });
       setSubmitted(true);
+      setValues(initialContactFormValues);
+      setAgreed(false);
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : 'Failed to submit form. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -209,13 +200,21 @@ export default function RequestDemoModal() {
                   id="modal-agree"
                   type="checkbox"
                   checked={agreed}
-                  onChange={(event) => setAgreed(event.target.checked)}
+                  onChange={(event) => {
+                    setAgreed(event.target.checked);
+                    if (errors.consent) {
+                      setErrors((current) => ({ ...current, consent: undefined }));
+                    }
+                    if (submitError) setSubmitError('');
+                  }}
                 />
                 <span>I agree to receive communication about Canary Waves.</span>
               </label>
+              {errors.consent && <span className="form-error">{errors.consent}</span>}
+              {submitError && <p className="form-error" role="alert">{submitError}</p>}
 
-              <button type="submit" className="btn btn-gold">
-                Submit request
+              <button type="submit" className="btn btn-gold" disabled={isSubmitting}>
+                {isSubmitting ? 'Submitting...' : 'Submit request'}
               </button>
               <a href="#contact" className="demo-modal-secondary" onClick={closeModal}>
                 Open contact section instead
