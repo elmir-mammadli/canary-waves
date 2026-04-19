@@ -20,20 +20,31 @@ import {
 } from '@/lib/landing-content';
 
 type JsonRecord = Record<string, unknown>;
+type ContentStatus = 'draft' | 'published';
+type LandingSectionKey = keyof LandingPageContent;
+type LandingPageApiData = Partial<Record<LandingSectionKey, unknown>>;
 
 const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL?.replace(/\/$/, '') ?? '';
 const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN;
 const isProduction = process.env.NODE_ENV === 'production';
 const rawFailOnError = (process.env.STRAPI_FAIL_ON_ERROR ?? '').toLowerCase();
 const STRAPI_FAIL_ON_ERROR = ['1', 'true', 'yes', 'on'].includes(rawFailOnError);
-const defaultStatus = isProduction ? 'published' : 'draft';
+const defaultStatus: ContentStatus = isProduction ? 'published' : 'draft';
 const rawStatus = (process.env.STRAPI_CONTENT_STATUS ?? defaultStatus).toLowerCase();
 const STRAPI_CONTENT_STATUS = rawStatus === 'draft' || rawStatus === 'published' ? rawStatus : defaultStatus;
-const defaultRevalidate = isProduction ? 60 : 0;
+const defaultRevalidate = isProduction ? 300 : 0;
 const rawRevalidate = process.env.STRAPI_REVALIDATE ?? String(defaultRevalidate);
 const normalizedRevalidate = rawRevalidate.trim().match(/^(\d+)\s*s?$/i)?.[1] ?? rawRevalidate;
 const parsedRevalidate = Number(normalizedRevalidate);
 const STRAPI_REVALIDATE_SECONDS = Number.isFinite(parsedRevalidate) ? parsedRevalidate : defaultRevalidate;
+const defaultFetchTimeoutMs = isProduction ? 4000 : 2500;
+const rawFetchTimeoutMs = process.env.STRAPI_FETCH_TIMEOUT_MS ?? String(defaultFetchTimeoutMs);
+const parsedFetchTimeoutMs = Number(rawFetchTimeoutMs);
+const STRAPI_FETCH_TIMEOUT_MS =
+  Number.isFinite(parsedFetchTimeoutMs) && parsedFetchTimeoutMs >= 0
+    ? parsedFetchTimeoutMs
+    : defaultFetchTimeoutMs;
+const LANDING_PAGE_ENDPOINT = 'landing-page';
 
 const SECTION_ENDPOINTS = {
   hero: 'hero-section',
@@ -238,9 +249,33 @@ interface SectionFetchResult {
   error: string | null;
 }
 
+interface LandingPageFetchResult {
+  data: LandingPageApiData | null;
+  error: string | null;
+  unsupported: boolean;
+}
+
 function describeError(error: unknown): string {
   if (error instanceof Error && error.message) return error.message;
   return String(error);
+}
+
+function createStrapiFetchOptions() {
+  const options: RequestInit & { next?: { revalidate: number } } = {
+    headers: STRAPI_TOKEN ? { Authorization: `Bearer ${STRAPI_TOKEN}` } : undefined,
+  };
+
+  if (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function' && STRAPI_FETCH_TIMEOUT_MS > 0) {
+    options.signal = AbortSignal.timeout(STRAPI_FETCH_TIMEOUT_MS);
+  }
+
+  if (STRAPI_REVALIDATE_SECONDS > 0) {
+    options.next = { revalidate: STRAPI_REVALIDATE_SECONDS };
+  } else {
+    options.cache = 'no-store';
+  }
+
+  return options;
 }
 
 async function fetchSection(endpoint: string): Promise<SectionFetchResult> {
@@ -254,12 +289,7 @@ async function fetchSection(endpoint: string): Promise<SectionFetchResult> {
 
   try {
     const query = getPopulateParams(endpoint).toString();
-    const response = await fetch(`${STRAPI_URL}/api/${endpoint}?${query}`, {
-      headers: STRAPI_TOKEN ? { Authorization: `Bearer ${STRAPI_TOKEN}` } : undefined,
-      ...(STRAPI_REVALIDATE_SECONDS > 0
-        ? { next: { revalidate: STRAPI_REVALIDATE_SECONDS } }
-        : { cache: 'no-store' as const }),
-    });
+    const response = await fetch(`${STRAPI_URL}/api/${endpoint}?${query}`, createStrapiFetchOptions());
 
     if (!response.ok) {
       const body = await response.text();
@@ -289,6 +319,116 @@ async function fetchSection(endpoint: string): Promise<SectionFetchResult> {
       error: describeError(error),
     };
   }
+}
+
+async function fetchLandingPage(): Promise<LandingPageFetchResult> {
+  if (!STRAPI_URL) {
+    return {
+      data: null,
+      error: 'NEXT_PUBLIC_STRAPI_URL is not set.',
+      unsupported: false,
+    };
+  }
+
+  try {
+    const params = new URLSearchParams();
+    params.append('status', STRAPI_CONTENT_STATUS);
+
+    const response = await fetch(
+      `${STRAPI_URL}/api/${LANDING_PAGE_ENDPOINT}?${params.toString()}`,
+      createStrapiFetchOptions()
+    );
+
+    if (response.status === 404 || response.status === 405) {
+      return {
+        data: null,
+        error: `HTTP ${response.status} ${response.statusText}`,
+        unsupported: true,
+      };
+    }
+
+    if (!response.ok) {
+      const body = await response.text();
+      return {
+        data: null,
+        error: `HTTP ${response.status} ${response.statusText}${body ? ` - ${body.slice(0, 220)}` : ''}`,
+        unsupported: false,
+      };
+    }
+
+    const payload = (await response.json()) as JsonRecord;
+    const data = asRecord(payload.data);
+
+    if (!data) {
+      return {
+        data: null,
+        error: 'No landing page data returned from Strapi.',
+        unsupported: false,
+      };
+    }
+
+    return {
+      data: data as LandingPageApiData,
+      error: null,
+      unsupported: false,
+    };
+  } catch (error) {
+    return {
+      data: null,
+      error: describeError(error),
+      unsupported: false,
+    };
+  }
+}
+
+function toSectionRecord(value: unknown): JsonRecord | null {
+  return normalizeEntry(value) ?? asRecord(value);
+}
+
+async function getLandingPageContentLegacy(): Promise<LandingPageContent> {
+  const [heroResult, aboutResult, featuresResult, workflowResult, whyUsResult, impactResult, teamResult, faqResult] =
+    await Promise.all([
+      fetchSection(SECTION_ENDPOINTS.hero),
+      fetchSection(SECTION_ENDPOINTS.about),
+      fetchSection(SECTION_ENDPOINTS.features),
+      fetchSection(SECTION_ENDPOINTS.workflow),
+      fetchSection(SECTION_ENDPOINTS.whyUs),
+      fetchSection(SECTION_ENDPOINTS.impact),
+      fetchSection(SECTION_ENDPOINTS.team),
+      fetchSection(SECTION_ENDPOINTS.faq),
+    ]);
+
+  const results = [
+    heroResult,
+    aboutResult,
+    featuresResult,
+    workflowResult,
+    whyUsResult,
+    impactResult,
+    teamResult,
+    faqResult,
+  ];
+  const errors = results.filter((result) => result.error);
+
+  if (errors.length > 0) {
+    const details = errors.map((result) => `- ${result.endpoint}: ${result.error}`).join('\n');
+    if (STRAPI_FAIL_ON_ERROR) {
+      throw new Error(`Strapi content fetch failed.\n${details}`);
+    }
+
+    console.warn(`Strapi fetch warning (legacy fallback in use):\n${details}`);
+  }
+
+  return {
+    hero: parseHero(heroResult.data, defaultLandingPageContent.hero),
+    about: parseAbout(aboutResult.data, defaultLandingPageContent.about),
+    features: parseFeatures(featuresResult.data, defaultLandingPageContent.features),
+    workflow: parseWorkflow(workflowResult.data, defaultLandingPageContent.workflow),
+    whyUs: parseWhyUs(whyUsResult.data, defaultLandingPageContent.whyUs),
+    impact: parseImpact(impactResult.data, defaultLandingPageContent.impact),
+    team: parseTeam(teamResult.data, defaultLandingPageContent.team),
+    faq: parseFaq(faqResult.data, defaultLandingPageContent.faq),
+  };
 }
 
 function parseHero(raw: JsonRecord | null, fallback: HeroContent): HeroContent {
@@ -525,47 +665,33 @@ function parseFaq(raw: JsonRecord | null, fallback: FAQContent): FAQContent {
 export async function getLandingPageContent(): Promise<LandingPageContent> {
   if (!STRAPI_URL) return defaultLandingPageContent;
 
-  const [heroResult, aboutResult, featuresResult, workflowResult, whyUsResult, impactResult, teamResult, faqResult] =
-    await Promise.all([
-      fetchSection(SECTION_ENDPOINTS.hero),
-      fetchSection(SECTION_ENDPOINTS.about),
-      fetchSection(SECTION_ENDPOINTS.features),
-      fetchSection(SECTION_ENDPOINTS.workflow),
-      fetchSection(SECTION_ENDPOINTS.whyUs),
-      fetchSection(SECTION_ENDPOINTS.impact),
-      fetchSection(SECTION_ENDPOINTS.team),
-      fetchSection(SECTION_ENDPOINTS.faq),
-    ]);
+  const aggregateResult = await fetchLandingPage();
 
-  const results = [
-    heroResult,
-    aboutResult,
-    featuresResult,
-    workflowResult,
-    whyUsResult,
-    impactResult,
-    teamResult,
-    faqResult,
-  ];
-  const errors = results.filter((result) => result.error);
-
-  if (errors.length > 0) {
-    const details = errors.map((result) => `- ${result.endpoint}: ${result.error}`).join('\n');
-    if (STRAPI_FAIL_ON_ERROR) {
-      throw new Error(`Strapi content fetch failed.\n${details}`);
-    }
-
-    console.warn(`Strapi fetch warning (fallback in use):\n${details}`);
+  if (aggregateResult.data) {
+    return {
+      hero: parseHero(toSectionRecord(aggregateResult.data.hero), defaultLandingPageContent.hero),
+      about: parseAbout(toSectionRecord(aggregateResult.data.about), defaultLandingPageContent.about),
+      features: parseFeatures(toSectionRecord(aggregateResult.data.features), defaultLandingPageContent.features),
+      workflow: parseWorkflow(toSectionRecord(aggregateResult.data.workflow), defaultLandingPageContent.workflow),
+      whyUs: parseWhyUs(toSectionRecord(aggregateResult.data.whyUs), defaultLandingPageContent.whyUs),
+      impact: parseImpact(toSectionRecord(aggregateResult.data.impact), defaultLandingPageContent.impact),
+      team: parseTeam(toSectionRecord(aggregateResult.data.team), defaultLandingPageContent.team),
+      faq: parseFaq(toSectionRecord(aggregateResult.data.faq), defaultLandingPageContent.faq),
+    };
   }
 
-  return {
-    hero: parseHero(heroResult.data, defaultLandingPageContent.hero),
-    about: parseAbout(aboutResult.data, defaultLandingPageContent.about),
-    features: parseFeatures(featuresResult.data, defaultLandingPageContent.features),
-    workflow: parseWorkflow(workflowResult.data, defaultLandingPageContent.workflow),
-    whyUs: parseWhyUs(whyUsResult.data, defaultLandingPageContent.whyUs),
-    impact: parseImpact(impactResult.data, defaultLandingPageContent.impact),
-    team: parseTeam(teamResult.data, defaultLandingPageContent.team),
-    faq: parseFaq(faqResult.data, defaultLandingPageContent.faq),
-  };
+  if (aggregateResult.unsupported) {
+    console.warn(`Strapi landing-page endpoint unavailable, using legacy section fetches.\n- ${aggregateResult.error}`);
+    return getLandingPageContentLegacy();
+  }
+
+  if (aggregateResult.error) {
+    if (STRAPI_FAIL_ON_ERROR) {
+      throw new Error(`Strapi landing page fetch failed.\n- ${aggregateResult.error}`);
+    }
+
+    console.warn(`Strapi landing page fetch warning (default fallback in use):\n- ${aggregateResult.error}`);
+  }
+
+  return defaultLandingPageContent;
 }
