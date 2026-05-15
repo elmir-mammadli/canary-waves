@@ -3,8 +3,6 @@
 import { useState } from 'react';
 import type { ContactSectionContent } from '@/lib/page-content';
 import CmsRichText from '@/components/CmsRichText';
-import Heading from '@/components/ui/Heading';
-import SectionLabel from '@/components/ui/SectionLabel';
 import {
   type ContactFormErrors,
   initialContactFormValues,
@@ -57,71 +55,76 @@ export default function ContactSection({ content }: ContactSectionProps) {
   };
 
   return (
-    <section id="contact" className="section section-cta section-contact">
-      <div className="shell contact-grid">
-        <div className="contact-copy">
-          <SectionLabel>{content.eyebrow}</SectionLabel>
-          <Heading as="h2" text={content.title} />
-          <CmsRichText value={content.description} className="contact-richtext" />
-          <ul role="list" className="contact-bullets">
-            {content.bullets.map((bullet) => (
-              <li key={bullet}>{bullet}</li>
-            ))}
-          </ul>
+    <section id="contact" className="section section-cta" data-reveal>
+      <div className="shell cta-layout">
+        <div className="cta-copy">
+          <p className="eyebrow light">{content.eyebrow}</p>
+          <h2>{content.title}</h2>
+          <CmsRichText value={content.description} className="cta-richtext" />
+          {content.bullets.length > 0 ? (
+            <ul role="list" className="cta-bullets">
+              {content.bullets.map((bullet) => (
+                <li key={bullet}>{bullet}</li>
+              ))}
+            </ul>
+          ) : null}
         </div>
 
-        <div className="contact-form-wrap">
+        <div className="cta-form-wrap">
           {submitted ? (
             <div className="form-success" role="status" aria-live="polite">
-              <p>Request received. We&apos;ll be in touch within one business day.</p>
+              <h3>You&apos;re on the list.</h3>
+              <p>Thanks for reaching out. Our team will contact you within one business day.</p>
             </div>
           ) : (
             <form onSubmit={onSubmit} noValidate className="cta-form">
-              <div className="form-row">
-                <label htmlFor="name">
-                  Name
-                  <input
-                    id="name"
-                    type="text"
-                    value={values.name}
-                    placeholder="Your name"
-                    onChange={onFieldChange('name')}
-                  />
-                  {errors.name && <span className="form-error">{errors.name}</span>}
-                </label>
-                <label htmlFor="company">
-                  Company
-                  <input
-                    id="company"
-                    type="text"
-                    value={values.company}
-                    placeholder="Operation name"
-                    onChange={onFieldChange('company')}
-                  />
-                  {errors.company && <span className="form-error">{errors.company}</span>}
-                </label>
-              </div>
+              <label htmlFor="name">
+                Name
+                <input
+                  id="name"
+                  type="text"
+                  value={values.name}
+                  placeholder="Jane Smith"
+                  onChange={onFieldChange('name')}
+                />
+                {errors.name && <span className="form-error">{errors.name}</span>}
+              </label>
+
+              <label htmlFor="company">
+                Company
+                <input
+                  id="company"
+                  type="text"
+                  value={values.company}
+                  placeholder="Canary Waves"
+                  onChange={onFieldChange('company')}
+                />
+                {errors.company && <span className="form-error">{errors.company}</span>}
+              </label>
+
               <label htmlFor="email">
                 Email
                 <input
                   id="email"
                   type="email"
                   value={values.email}
-                  placeholder="your@email.com"
+                  placeholder="jane@company.com"
                   onChange={onFieldChange('email')}
                 />
                 {errors.email && <span className="form-error">{errors.email}</span>}
               </label>
+
               <label htmlFor="message">
                 Message (optional)
                 <textarea
                   id="message"
-                  rows={3}
+                  rows={4}
                   value={values.message}
-                  placeholder="Tell us about your site — radios, channels, key safety challenges..."
+                  placeholder="Tell us about your site, team size, or current tools."
                   onChange={onFieldChange('message')}
                 />
               </label>
+
               <label className="check-row" htmlFor="agree">
                 <input
                   id="agree"
@@ -129,11 +132,13 @@ export default function ContactSection({ content }: ContactSectionProps) {
                   checked={agreed}
                   onChange={(event) => {
                     setAgreed(event.target.checked);
-                    if (errors.consent) setErrors((current) => ({ ...current, consent: undefined }));
+                    if (errors.consent) {
+                      setErrors((current) => ({ ...current, consent: undefined }));
+                    }
                     if (submitError) setSubmitError('');
                   }}
                 />
-                <span>I&apos;m open to hearing how Canary Waves could work for my operation.</span>
+                <span>I agree to receive communication about Canary Waves.</span>
               </label>
               {errors.consent && <span className="form-error">{errors.consent}</span>}
               {submitError && (
@@ -141,8 +146,9 @@ export default function ContactSection({ content }: ContactSectionProps) {
                   {submitError}
                 </p>
               )}
-              <button type="submit" className="btn btn-gold btn-block" disabled={isSubmitting}>
-                {isSubmitting ? 'Submitting...' : 'Book my walkthrough →'}
+
+              <button type="submit" className="btn btn-gold" disabled={isSubmitting}>
+                {isSubmitting ? 'Submitting...' : 'Request demo'}
               </button>
             </form>
           )}

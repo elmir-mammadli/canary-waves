@@ -1,6 +1,5 @@
 import Image from 'next/image';
 import type { HeroSectionContent } from '@/lib/page-content';
-import Heading from '@/components/ui/Heading';
 
 interface HeroSectionProps {
   content: HeroSectionContent;
@@ -17,10 +16,11 @@ export default function HeroSection({ content }: HeroSectionProps) {
         sizes="100vw"
         className="hero-media"
       />
-      <div className="hero-overlay" aria-hidden />
+      <div className="hero-overlay" />
+
       <div className="hero-inner">
         <p className="hero-brand">{content.label}</p>
-        <Heading as="h1" text={content.heading} />
+        <h1>{content.heading}</h1>
         <p className="hero-copy">{content.subheading}</p>
         <div className="hero-actions">
           <a href="#contact" className="btn btn-gold" data-demo-trigger>

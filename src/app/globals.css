@@ -572,6 +572,40 @@ h2 {
   color: rgba(31, 23, 22, 0.88);
 }
 
+.platform-callout-inline {
+  margin: 1.5rem 0 0;
+  padding: 1rem 0 0;
+  border-top: 1px solid rgba(31, 23, 22, 0.12);
+}
+
+.platform-callout-inline p {
+  margin: 0;
+  font-style: italic;
+  color: rgba(31, 23, 22, 0.9);
+}
+
+.platform-callout-inline cite {
+  display: block;
+  margin-top: 0.6rem;
+  font-size: 0.82rem;
+  font-style: normal;
+  color: rgba(31, 23, 22, 0.65);
+}
+
+.cta-bullets {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.cta-bullets li {
+  padding-left: 1rem;
+  border-left: 2px solid rgba(255, 190, 86, 0.5);
+  color: rgba(255, 255, 255, 0.9);
+}
+
 .section-signals {
   background: linear-gradient(180deg, rgba(137, 116, 101, 0.08) 0%, rgba(137, 116, 101, 0) 100%);
 }

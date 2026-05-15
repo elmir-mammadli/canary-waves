@@ -47,8 +47,9 @@ Copy `.env.example` to `.env.local`:
 | `sections.platform` | Platform copy, pillars, callout quote |
 | `sections.signals` | Signal rows (tag, kicker, image, flip) |
 | `sections.workflow` | Four workflow steps + CTA label |
-| `sections.why-us` | Why cards + stats band + narrative |
-| `sections.team` | Team intro + members (with `bio`) |
+| `sections.why-us` | Why teams adopt it proof cards |
+| `sections.impact` | Ring stats + “Incident prevention levels…” copy |
+| `sections.team` | Team intro + members (with `bio` in CMS, optional in UI) |
 | `sections.contact` | Contact copy + bullets (form is in code) |
 | `sections.faq` | FAQ items |
 

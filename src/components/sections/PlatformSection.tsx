@@ -1,8 +1,5 @@
 import type { PlatformSectionContent } from '@/lib/page-content';
 import CmsRichText from '@/components/CmsRichText';
-import FadeUp from '@/components/ui/FadeUp';
-import Heading from '@/components/ui/Heading';
-import SectionLabel from '@/components/ui/SectionLabel';
 
 interface PlatformSectionProps {
   content: PlatformSectionContent;
@@ -10,27 +7,27 @@ interface PlatformSectionProps {
 
 export default function PlatformSection({ content }: PlatformSectionProps) {
   return (
-    <section id="platform" className="section section-platform">
-      <div className="shell">
-        <SectionLabel>{content.eyebrow}</SectionLabel>
-        <Heading as="h2" text={content.title} className="section-platform-title" />
-        <div className="platform-grid">
-          <div className="platform-body">
-            <CmsRichText value={content.body} className="section-richtext" />
-            <ul role="list" className="platform-list">
-              {content.pillars.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </div>
-          <FadeUp>
-            <blockquote className="platform-callout">
+    <section id="platform" className="section section-platform" data-reveal>
+      <div className="shell two-col">
+        <div>
+          <p className="eyebrow">{content.eyebrow}</p>
+          <h2>{content.title}</h2>
+        </div>
+        <div className="section-copy">
+          <CmsRichText value={content.body} className="section-richtext" />
+          <ul role="list" className="text-list">
+            {content.pillars.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+          {content.calloutQuote ? (
+            <blockquote className="platform-callout-inline">
               <p>{content.calloutQuote}</p>
               {content.calloutAttribution ? (
-                <cite className="platform-callout-attr">{content.calloutAttribution}</cite>
+                <cite>{content.calloutAttribution}</cite>
               ) : null}
             </blockquote>
-          </FadeUp>
+          ) : null}
         </div>
       </div>
     </section>

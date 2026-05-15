@@ -2,7 +2,7 @@
   "collectionName": "components_sections_why_uses",
   "info": {
     "displayName": "Why Us Section",
-    "description": "Why us cards, stats band, and narrative"
+    "description": "Why teams adopt it proof cards"
   },
   "attributes": {
     "eyebrow": {
@@ -16,20 +16,6 @@
       "type": "component",
       "repeatable": true,
       "component": "sections.why-card"
-    },
-    "stats": {
-      "type": "component",
-      "repeatable": true,
-      "component": "shared.stat-item"
-    },
-    "statsNote": {
-      "type": "text"
-    },
-    "narrativeTitle": {
-      "type": "string"
-    },
-    "narrativeBody": {
-      "type": "text"
     }
   }
 }

@@ -1,0 +1,25 @@
+{
+  "collectionName": "components_sections_impacts",
+  "info": {
+    "displayName": "Impact Section",
+    "description": "Impact stats visualization and copy"
+  },
+  "attributes": {
+    "title": {
+      "type": "text",
+      "required": true
+    },
+    "description": {
+      "type": "text",
+      "required": true
+    },
+    "caption": {
+      "type": "text"
+    },
+    "stats": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.stat-item"
+    }
+  }
+}

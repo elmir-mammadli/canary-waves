@@ -75,10 +75,14 @@ export interface WhyUsSectionContent {
   eyebrow: string;
   title: string;
   cards: WhyCardContent[];
+}
+
+export interface ImpactSectionContent {
+  type: 'impact';
+  title: string;
+  description: CmsText;
+  caption: CmsText;
   stats: StatItemContent[];
-  statsNote: string;
-  narrativeTitle: string;
-  narrativeBody: CmsText;
 }
 
 export interface TeamMemberContent {
@@ -123,6 +127,7 @@ export type PageSection =
   | SignalsSectionContent
   | WorkflowSectionContent
   | WhyUsSectionContent
+  | ImpactSectionContent
   | TeamSectionContent
   | ContactSectionContent
   | FAQSectionContent;
@@ -265,35 +270,26 @@ export const defaultHomePage: PageContent = {
           imageAlt: 'Operations overview at industrial site',
         },
       ],
+    },
+    {
+      type: 'impact',
+      title: 'Incident prevention levels enabled by real-time audio analysis',
+      description:
+        'Intelligence analysis of radio conversations helps detect early warning signs before they turn into actual accidents.',
+      caption:
+        'Percentage of incidents prevented according to the type of risk detected in advance by Canary Waves system.',
       stats: [
-        {
-          value: 78,
-          suffix: '%',
-          label: 'Misuse of heavy machinery incidents detected in advance',
-        },
-        {
-          value: 85,
-          suffix: '%',
-          label: 'Operational communication errors caught before escalation',
-        },
-        {
-          value: 91,
-          suffix: '%',
-          label: 'Safety protocol violations surfaced through radio analysis',
-        },
+        { value: 78, suffix: '%', label: 'Misuse of heavy machinery' },
+        { value: 85, suffix: '%', label: 'Operational communication errors' },
+        { value: 91, suffix: '%', label: 'Safety protocol violations' },
       ],
-      statsNote:
-        'Percentage of incidents prevented according to risk type detected in advance by the Canary Waves system.',
-      narrativeTitle: 'How much of this is already in your radio traffic?',
-      narrativeBody:
-        'The signals that precede most incidents are not hidden. They are already being said out loud — on your radios, every shift.',
     },
     {
       type: 'team',
       eyebrow: 'Team',
-      title: "Built by people who've stood on the sites they're making safer.",
+      title: 'Built by operators and builders focused on preventable risk.',
       description:
-        "Canary Waves exists because Jack has worked the sites where preventable incidents still happen — and Julia has spent a career building technology that actually gets adopted. Together, they're closing the gap between what frontline crews say on the radio and what leaders can act on.",
+        'Canary Waves exists to close the gap between what frontline teams say in the moment and what decision makers can actually act on. We believe AI should reduce harm, increase accountability, and make every shift safer.',
       members: [
         {
           name: 'Jack Kellner',
@@ -314,14 +310,10 @@ export const defaultHomePage: PageContent = {
     {
       type: 'contact',
       eyebrow: 'Contact',
-      title: 'What is your radio traffic trying to tell you right now?',
+      title: 'Ready to see what your radio traffic is trying to tell you?',
       description:
-        "Book a 30-minute walkthrough. We'll show you exactly what signals Canary Waves would surface from a typical shift — mapped to your site, your safety priorities, and your reporting structure.",
-      bullets: [
-        "See the exact signals we'd surface from a typical shift on your type of site",
-        'No long sales process — if it fits, we can have a POC running within weeks',
-        'First POC partners co-shape the product roadmap and get priority access',
-      ],
+        'Book a walkthrough and we will map Canary Waves to your current environment, safety goals, and reporting workflow.',
+      bullets: [],
     },
     {
       type: 'faq',

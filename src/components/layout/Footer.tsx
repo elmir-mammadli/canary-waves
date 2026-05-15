@@ -45,15 +45,17 @@ export default function Footer() {
           <a href="#home" aria-label="Canary Waves home">
             <img src="/canary_waves_logo.svg" alt="Canary Waves" />
           </a>
-          <p>For the people who believe preventable should mean prevented.</p>
+          <p>
+            Voice intelligence platform for safer, faster, and more accountable industrial
+            operations.
+          </p>
+          <a href="#contact" className="btn btn-gold" data-demo-trigger>
+            Request demo
+          </a>
         </div>
         <LinkGroup title="Site" links={siteLinks} />
         <LinkGroup title="Legal" links={legalLinks} />
         <LinkGroup title="Connect" links={contactLinks} />
-      </div>
-      <div className="shell footer-bottom">
-        <p>© 2025 Canary Waves · Part of KB&G Innovation Studio</p>
-        <p>A product built for the frontline.</p>
       </div>
     </footer>
   );

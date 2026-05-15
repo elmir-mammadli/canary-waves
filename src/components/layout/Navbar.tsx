@@ -94,7 +94,7 @@ export default function Navbar() {
         </ul>
 
         <a href="#contact" className="nav-cta" data-demo-trigger>
-          Book a Demo
+          Request Demo
         </a>
 
         <button
@@ -132,7 +132,7 @@ export default function Navbar() {
           ))}
           <li>
             <a href="#contact" className="mobile-cta" data-demo-trigger onClick={() => setMenuOpen(false)}>
-              Book a Demo
+              Request Demo
             </a>
           </li>
         </ul>

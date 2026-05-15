@@ -4,6 +4,7 @@ import {
   type FAQItemContent,
   type FAQSectionContent,
   type HeroSectionContent,
+  type ImpactSectionContent,
   type PageContent,
   type PageSection,
   type PlatformSectionContent,
@@ -50,6 +51,7 @@ const COMPONENT_TYPE_MAP: Record<string, PageSection['type']> = {
   'sections.signals': 'signals',
   'sections.workflow': 'workflow',
   'sections.why-us': 'why-us',
+  'sections.impact': 'impact',
   'sections.team': 'team',
   'sections.contact': 'contact',
   'sections.faq': 'faq',
@@ -332,10 +334,16 @@ function parseWhyUs(raw: JsonRecord, fallback: WhyUsSectionContent): WhyUsSectio
     eyebrow: getString(raw.eyebrow) ?? fallback.eyebrow,
     title: getString(raw.title) ?? fallback.title,
     cards: parseWhyCards(raw.cards ?? raw.items, fallback.cards),
-    stats: parseStats(raw.stats, fallback.stats),
-    statsNote: getString(raw.statsNote) ?? getString(raw.caption) ?? fallback.statsNote,
-    narrativeTitle: getString(raw.narrativeTitle) ?? getString(raw.impactTitle) ?? fallback.narrativeTitle,
-    narrativeBody: getCmsText(raw.narrativeBody) ?? getCmsText(raw.description) ?? fallback.narrativeBody,
+  };
+}
+
+function parseImpact(raw: JsonRecord, fallback: ImpactSectionContent): ImpactSectionContent {
+  return {
+    type: 'impact',
+    title: getString(raw.title) ?? fallback.title,
+    description: getCmsText(raw.description) ?? getCmsText(raw.copy) ?? fallback.description,
+    caption: getCmsText(raw.caption) ?? getCmsText(raw.statsNote) ?? fallback.caption,
+    stats: parseStats(raw.stats ?? raw.items ?? raw.metrics, fallback.stats),
   };
 }
 
@@ -420,6 +428,8 @@ function parseSection(raw: JsonRecord, fallbacks: PageSection[]): PageSection | 
       return parseWorkflow(raw, fallback as WorkflowSectionContent);
     case 'why-us':
       return parseWhyUs(raw, fallback as WhyUsSectionContent);
+    case 'impact':
+      return parseImpact(raw, fallback as ImpactSectionContent);
     case 'team':
       return parseTeam(raw, fallback as TeamSectionContent);
     case 'contact':

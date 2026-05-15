@@ -133,16 +133,19 @@ const HOME_SECTIONS = [
           'Safety managers and ops leaders get a single operational narrative — just the signals that matter.',
       },
     ],
+  },
+  {
+    __component: 'sections.impact',
+    title: 'Incident prevention levels enabled by real-time audio analysis',
+    description:
+      'Intelligence analysis of radio conversations helps detect early warning signs before they turn into actual accidents.',
+    caption:
+      'Percentage of incidents prevented according to the type of risk detected in advance by Canary Waves system.',
     stats: [
-      { value: 78, suffix: '%', label: 'Misuse of heavy machinery incidents detected in advance' },
-      { value: 85, suffix: '%', label: 'Operational communication errors caught before escalation' },
-      { value: 91, suffix: '%', label: 'Safety protocol violations surfaced through radio analysis' },
+      { value: 78, suffix: '%', label: 'Misuse of heavy machinery' },
+      { value: 85, suffix: '%', label: 'Operational communication errors' },
+      { value: 91, suffix: '%', label: 'Safety protocol violations' },
     ],
-    statsNote:
-      'Percentage of incidents prevented according to risk type detected in advance by the Canary Waves system.',
-    narrativeTitle: 'How much of this is already in your radio traffic?',
-    narrativeBody:
-      'The signals that precede most incidents are not hidden. They are already being said out loud — on your radios, every shift.',
   },
   {
     __component: 'sections.team',
@@ -175,14 +178,10 @@ const HOME_SECTIONS = [
   {
     __component: 'sections.contact',
     eyebrow: 'Contact',
-    title: 'What is your radio traffic trying to tell you right now?',
+    title: 'Ready to see what your radio traffic is trying to tell you?',
     description:
-      "Book a 30-minute walkthrough. We'll show you exactly what signals Canary Waves would surface from a typical shift.",
-    bullets: [
-      { text: "See the exact signals we'd surface from a typical shift on your type of site" },
-      { text: 'No long sales process — if it fits, we can have a POC running within weeks' },
-      { text: 'First POC partners co-shape the product roadmap and get priority access' },
-    ],
+      'Book a walkthrough and we will map Canary Waves to your current environment, safety goals, and reporting workflow.',
+    bullets: [],
   },
   {
     __component: 'sections.faq',
