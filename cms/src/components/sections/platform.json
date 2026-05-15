@@ -1,0 +1,31 @@
+{
+  "collectionName": "components_sections_platforms",
+  "info": {
+    "displayName": "Platform Section",
+    "description": "Platform overview with callout"
+  },
+  "attributes": {
+    "eyebrow": {
+      "type": "string"
+    },
+    "title": {
+      "type": "text",
+      "required": true
+    },
+    "body": {
+      "type": "blocks"
+    },
+    "pillars": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.text-item"
+    },
+    "calloutQuote": {
+      "type": "text",
+      "required": true
+    },
+    "calloutAttribution": {
+      "type": "string"
+    }
+  }
+}

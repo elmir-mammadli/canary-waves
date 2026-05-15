@@ -1,0 +1,39 @@
+{
+  "collectionName": "components_sections_signal_items",
+  "info": {
+    "displayName": "Signal Item",
+    "description": "A single signal feature row"
+  },
+  "attributes": {
+    "tag": {
+      "type": "enumeration",
+      "enum": ["red", "amber", "teal"],
+      "default": "red",
+      "required": true
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "kicker": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "text",
+      "required": true
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"],
+      "required": true
+    },
+    "imageAlt": {
+      "type": "string"
+    },
+    "reverseLayout": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

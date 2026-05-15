@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import type { CmsText, StrapiRichTextNode } from '@/lib/landing-content';
+import type { CmsText, StrapiRichTextNode } from '@/lib/page-content';
 
 interface CmsRichTextProps {
   value: CmsText;

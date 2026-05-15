@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_sections_signals",
+  "info": {
+    "displayName": "Signals Section",
+    "description": "Signal feature rows"
+  },
+  "attributes": {
+    "eyebrow": {
+      "type": "string"
+    },
+    "title": {
+      "type": "text",
+      "required": true
+    },
+    "items": {
+      "type": "component",
+      "repeatable": true,
+      "component": "sections.signal-item"
+    }
+  }
+}

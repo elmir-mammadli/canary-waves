@@ -1,0 +1,37 @@
+{
+  "collectionName": "components_sections_heroes",
+  "info": {
+    "displayName": "Hero Section",
+    "description": "Home hero"
+  },
+  "attributes": {
+    "label": {
+      "type": "string"
+    },
+    "heading": {
+      "type": "text",
+      "required": true
+    },
+    "subheading": {
+      "type": "text",
+      "required": true
+    },
+    "primaryCtaLabel": {
+      "type": "string"
+    },
+    "secondaryCtaLabel": {
+      "type": "string"
+    },
+    "proofItems": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.text-item"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"],
+      "required": true
+    }
+  }
+}

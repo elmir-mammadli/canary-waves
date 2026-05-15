@@ -1,0 +1,24 @@
+{
+  "collectionName": "components_sections_workflows",
+  "info": {
+    "displayName": "Workflow Section",
+    "description": "Four-step workflow"
+  },
+  "attributes": {
+    "eyebrow": {
+      "type": "string"
+    },
+    "title": {
+      "type": "text",
+      "required": true
+    },
+    "ctaLabel": {
+      "type": "string"
+    },
+    "steps": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.workflow-step"
+    }
+  }
+}

@@ -1,20 +1,17 @@
 {
-  "collectionName": "components_shared_team_members",
+  "collectionName": "components_sections_why_cards",
   "info": {
-    "displayName": "Team Member",
-    "description": "Team profile"
+    "displayName": "Why Card",
+    "description": "Why us proof card with image"
   },
   "attributes": {
-    "name": {
+    "title": {
       "type": "string",
       "required": true
     },
-    "role": {
-      "type": "string",
+    "description": {
+      "type": "text",
       "required": true
-    },
-    "bio": {
-      "type": "text"
     },
     "image": {
       "type": "media",

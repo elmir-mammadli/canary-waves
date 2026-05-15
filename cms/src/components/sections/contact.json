@@ -1,0 +1,25 @@
+{
+  "collectionName": "components_sections_contacts",
+  "info": {
+    "displayName": "Contact Section",
+    "description": "Contact copy and bullets"
+  },
+  "attributes": {
+    "eyebrow": {
+      "type": "string"
+    },
+    "title": {
+      "type": "text",
+      "required": true
+    },
+    "description": {
+      "type": "text",
+      "required": true
+    },
+    "bullets": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.text-item"
+    }
+  }
+}

@@ -14,5 +14,12 @@ export default {
    * This gives you an opportunity to set up your data model,
    * run jobs, or perform some special logic.
    */
-  bootstrap(/* { strapi }: { strapi: Core.Strapi } */) {},
+  async bootstrap({ strapi }) {
+    const { seedHomePageIfMissing } = await import('./bootstrap/seed-home-page');
+    try {
+      await seedHomePageIfMissing(strapi as Parameters<typeof seedHomePageIfMissing>[0]);
+    } catch (error) {
+      strapi.log.warn(`[seed] Home page seed skipped: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  },
 };

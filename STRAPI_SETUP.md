@@ -1,215 +1,96 @@
 # Strapi CMS Setup For Canary Waves
 
-This project reads editable section content from Strapi for:
+The home page is a **Page** collection entry (`slug: home`) with a **dynamic zone** of section components.
 
-- Hero
-- Platform (About)
-- Signals (Features)
-- Workflow
-- Why Us
-- Impact
-- Team
-- FAQ
-
-`Navbar`, `Footer`, and `CTA form` are intentionally **not** CMS-driven.
+`Navbar`, `Footer`, and `RequestDemoModal` stay in code.
 
 ---
 
-## 0) Monorepo Layout
+## Monorepo layout
 
-This repository now contains:
-
-- `./` -> Next.js frontend
-- `./cms` -> Strapi backend
-
-Start CMS locally:
+- `./` — Next.js frontend
+- `./cms` — Strapi backend
 
 ```bash
-npm run dev:cms
+npm run dev:cms   # Strapi on :1337
+npm run dev       # Next.js
 ```
 
 ---
 
-## 1) Environment Variables
+## Environment variables
 
-Create `.env.local` from `.env.example`:
+Copy `.env.example` to `.env.local`:
 
-```bash
-cp .env.example .env.local
-```
-
-Set:
-
-- `NEXT_PUBLIC_STRAPI_URL` (example: `http://localhost:1337`)
-- `STRAPI_API_TOKEN` (optional but recommended for production)
-- `STRAPI_CONTENT_STATUS` (`published` or `draft`)
-- `STRAPI_REVALIDATE` (seconds, use `0` for no-store)
-- `STRAPI_FAIL_ON_ERROR` (`true` to fail loudly when CMS fetch fails)
-
-Defaults if not set:
-
-- Development: `draft` + `no-store` + `fallback allowed`
-- Production: `published` + `60s revalidate` + `fallback allowed`
-
-Recommended for local content editing:
-
-```env
-STRAPI_CONTENT_STATUS=draft
-STRAPI_REVALIDATE=0
-STRAPI_FAIL_ON_ERROR=false
-```
-
-Recommended for production:
-
-```env
-STRAPI_CONTENT_STATUS=published
-STRAPI_REVALIDATE=60
-STRAPI_FAIL_ON_ERROR=false
-```
+- `NEXT_PUBLIC_STRAPI_URL` — e.g. `http://localhost:1337`
+- `STRAPI_API_TOKEN` — optional locally, recommended in production
+- `STRAPI_CONTENT_STATUS` — `draft` or `published`
+- `STRAPI_REVALIDATE` — seconds (`0` = no-store)
 
 ---
 
-## 2) Create Strapi Components
+## Content model
 
-Create these reusable components in Strapi:
+### Collection: `Page`
 
-1. `shared.text-item`
-- `text` (Text)
+| Field | Type |
+|-------|------|
+| `title` | Text |
+| `slug` | UID (use `home` for the landing page) |
+| `sections` | Dynamic zone |
 
-2. `shared.feature-item`
-- `title` (Text)
-- `summary` (Text)
-- `image` (Media, single)
-- `imageAlt` (Text, optional)
+### Section components (`sections.*`)
 
-3. `shared.workflow-step`
-- `step` (Text, example: `01`)
-- `title` (Text)
-- `description` (Text)
+| Component | Purpose |
+|-----------|---------|
+| `sections.hero` | Hero image, label, heading, CTAs, proof bullets |
+| `sections.platform` | Platform copy, pillars, callout quote |
+| `sections.signals` | Signal rows (tag, kicker, image, flip) |
+| `sections.workflow` | Four workflow steps + CTA label |
+| `sections.why-us` | Why cards + stats band + narrative |
+| `sections.team` | Team intro + members (with `bio`) |
+| `sections.contact` | Contact copy + bullets (form is in code) |
+| `sections.faq` | FAQ items |
 
-4. `shared.team-member`
-- `name` (Text)
-- `role` (Text)
-- `image` (Media, single)
-- `imageAlt` (Text, optional)
+### Shared components
 
-5. `shared.faq-item`
-- `question` (Text)
-- `answer` (Text)
-
-6. `shared.stat-item`
-- `value` (Number)
-- `suffix` (Text, default `%`)
-- `label` (Text)
+- `shared.text-item`, `shared.workflow-step`, `shared.stat-item`, `shared.faq-item`
+- `shared.team-member` (includes `bio`)
+- `sections.signal-item`, `sections.why-card`
 
 ---
 
-## 3) Create Single Types (exact API IDs)
+## Permissions
 
-Create these Single Types with exact API IDs:
+In Strapi Admin → Settings → Users & Permissions → Roles → **Public**:
 
-1. `hero-section`
-- `brand` (Text)
-- `heading` (Text)
-- `subheading` (Text)
-- `primaryCtaLabel` (Text)
-- `secondaryCtaLabel` (Text)
-- `notes` (Repeatable component: `shared.text-item`)
-- `image` (Media, single)
-
-2. `about-section`
-- `eyebrow` (Text)
-- `title` (Text)
-- `description` (Text)
-- `pillars` (Repeatable component: `shared.text-item`)
-
-3. `signals-section`
-- `eyebrow` (Text)
-- `title` (Text)
-- `items` (Repeatable component: `shared.feature-item`)
-
-4. `workflow-section`
-- `eyebrow` (Text)
-- `title` (Text)
-- `ctaLabel` (Text)
-- `steps` (Repeatable component: `shared.workflow-step`)
-
-5. `why-us-section`
-- `eyebrow` (Text)
-- `title` (Text)
-- `items` (Repeatable component: `shared.feature-item`)
-
-6. `team-section`
-- `eyebrow` (Text)
-- `title` (Text)
-- `description` (Text)
-- `members` (Repeatable component: `shared.team-member`)
-
-7. `impact-section`
-- `title` (Text)
-- `description` (Text)
-- `caption` (Text, optional)
-- `stats` (Repeatable component: `shared.stat-item`)
-
-8. `faq-section`
-- `eyebrow` (Text)
-- `title` (Text)
-- `items` (Repeatable component: `shared.faq-item`)
+- **Page**: enable `find` and `findOne`
+- **Form Submission**: enable `create` (for contact form)
 
 ---
 
-## 4) API Permissions
+## API
 
-Choose one:
-
-1. Public read:
-- Settings -> Users & Permissions -> Roles -> Public
-- Enable `find` on each single type above
-
-2. Token-based read (recommended):
-- Settings -> API Tokens -> Create token with read access
-- Put token value in `STRAPI_API_TOKEN`
-
----
-
-## 5) Restart Next.js
-
-After changing env vars:
-
-```bash
-npm run dev
+```http
+GET /api/pages?filters[slug][$eq]=home&populate[sections][populate]=*
 ```
 
-The frontend falls back to local default content if Strapi is unavailable.
-Set `STRAPI_FAIL_ON_ERROR=true` only when you explicitly want hard failures for debugging.
+Frontend: `getPageBySlug('home')` in `src/lib/strapi-page.ts`.
 
-If the frontend keeps showing `landing-content.ts` values, the usual cause is that Strapi is not
-actually running at `http://localhost:1337`. In that case the frontend cannot fetch CMS data and
-falls back by design.
-
-Common local fix when Strapi fails to boot after a Node version change:
-
-```bash
-npm run repair:cms
-npm run dev:cms
-```
-
-If you set `STRAPI_REVALIDATE`, use a plain number of seconds such as `60`.
-`60s` is now also accepted by the frontend parser.
+Defaults when Strapi is unavailable: `src/lib/page-content.ts` → `defaultHomePage`.
 
 ---
 
-## 6) Strapi Cloud (Monorepo)
+## First-time seed
 
-When deploying `cms` to Strapi Cloud from this same repo:
+On CMS bootstrap, a published `home` page is created automatically if none exists (`cms/src/bootstrap/seed-home-page.ts`).
 
-1. Choose this GitHub repository.
-2. Click **Show more**.
-3. Set **Base directory / Project directory** to:
+To edit sections: Strapi Admin → **Content Manager** → **Page** → **Home** → reorder/add sections in the dynamic zone.
 
-```text
-cms
-```
+---
 
-Without that, Strapi Cloud checks repo root and shows:
-`Strapi was not found in the project dependencies`.
+## Troubleshooting
+
+- **Still seeing old defaults**: check `STRAPI_CONTENT_STATUS` matches your entry status (draft vs published).
+- **Images missing**: upload media in Strapi for hero/signals/why cards/team; local defaults use `/public/images/*`.
+- **Empty sections**: ensure each dynamic-zone block has required fields filled before publish.
