@@ -16,11 +16,11 @@ const contactLinks = [
   { label: 'LinkedIn', href: 'https://www.linkedin.com/company/canary-waves/' },
 ];
 
-function LinkGroup({ title, links }: { title: string; links: Array<{ label: string; href: string }> }) {
+function FooterCol({ title, links }: { title: string; links: Array<{ label: string; href: string }> }) {
   return (
-    <div>
-      <h3>{title}</h3>
-      <ul role="list">
+    <div className="footer-col">
+      <h4>{title}</h4>
+      <ul>
         {links.map((link) => (
           <li key={link.label}>
             <a
@@ -39,23 +39,19 @@ function LinkGroup({ title, links }: { title: string; links: Array<{ label: stri
 
 export default function Footer() {
   return (
-    <footer className="site-footer">
-      <div className="shell footer-grid">
+    <footer>
+      <div className="footer-top">
         <div className="footer-brand">
-          <a href="#home" aria-label="Canary Waves home">
-            <img src="/canary_waves_logo.svg" alt="Canary Waves" />
-          </a>
-          <p>
-            Voice intelligence platform for safer, faster, and more accountable industrial
-            operations.
-          </p>
-          <a href="#contact" className="btn btn-gold" data-demo-trigger>
-            Request demo
-          </a>
+          <img src="/canary_waves_logo.svg" alt="Canary Waves" />
+          <p>For the people who believe preventable should mean prevented.</p>
         </div>
-        <LinkGroup title="Site" links={siteLinks} />
-        <LinkGroup title="Legal" links={legalLinks} />
-        <LinkGroup title="Connect" links={contactLinks} />
+        <FooterCol title="Site" links={siteLinks} />
+        <FooterCol title="Legal" links={legalLinks} />
+        <FooterCol title="Connect" links={contactLinks} />
+      </div>
+      <div className="footer-bottom">
+        <p>© 2025 Canary Waves · Part of KB&G Innovation Studio</p>
+        <p>A product built for the frontline.</p>
       </div>
     </footer>
   );

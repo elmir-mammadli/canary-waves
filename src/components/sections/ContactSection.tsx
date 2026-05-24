@@ -55,103 +55,103 @@ export default function ContactSection({ content }: ContactSectionProps) {
   };
 
   return (
-    <section id="contact" className="section section-cta" data-reveal>
-      <div className="shell cta-layout">
-        <div className="cta-copy">
-          <p className="eyebrow light">{content.eyebrow}</p>
+    <section id="contact">
+      <div className="contact-grid">
+        <div className="contact-left">
+          <p className="sec-label">{content.eyebrow}</p>
           <h2>{content.title}</h2>
-          <CmsRichText value={content.description} className="cta-richtext" />
-          {content.bullets.length > 0 ? (
-            <ul role="list" className="cta-bullets">
-              {content.bullets.map((bullet) => (
-                <li key={bullet}>{bullet}</li>
-              ))}
-            </ul>
-          ) : null}
+          <CmsRichText value={content.description} />
+          {content.bullets.map((bullet) => (
+            <div key={bullet} className="contact-bullet">
+              <div className="dot" />
+              <p>{bullet}</p>
+            </div>
+          ))}
         </div>
 
-        <div className="cta-form-wrap">
-          {submitted ? (
-            <div className="form-success" role="status" aria-live="polite">
-              <h3>You&apos;re on the list.</h3>
-              <p>Thanks for reaching out. Our team will contact you within one business day.</p>
-            </div>
-          ) : (
-            <form onSubmit={onSubmit} noValidate className="cta-form">
-              <label htmlFor="name">
-                Name
-                <input
-                  id="name"
-                  type="text"
-                  value={values.name}
-                  placeholder="Jane Smith"
-                  onChange={onFieldChange('name')}
-                />
-                {errors.name && <span className="form-error">{errors.name}</span>}
-              </label>
-
-              <label htmlFor="company">
-                Company
-                <input
-                  id="company"
-                  type="text"
-                  value={values.company}
-                  placeholder="Canary Waves"
-                  onChange={onFieldChange('company')}
-                />
-                {errors.company && <span className="form-error">{errors.company}</span>}
-              </label>
-
-              <label htmlFor="email">
-                Email
-                <input
-                  id="email"
-                  type="email"
-                  value={values.email}
-                  placeholder="jane@company.com"
-                  onChange={onFieldChange('email')}
-                />
-                {errors.email && <span className="form-error">{errors.email}</span>}
-              </label>
-
-              <label htmlFor="message">
-                Message (optional)
-                <textarea
-                  id="message"
-                  rows={4}
-                  value={values.message}
-                  placeholder="Tell us about your site, team size, or current tools."
-                  onChange={onFieldChange('message')}
-                />
-              </label>
-
-              <label className="check-row" htmlFor="agree">
-                <input
-                  id="agree"
-                  type="checkbox"
-                  checked={agreed}
-                  onChange={(event) => {
-                    setAgreed(event.target.checked);
-                    if (errors.consent) {
-                      setErrors((current) => ({ ...current, consent: undefined }));
-                    }
-                    if (submitError) setSubmitError('');
-                  }}
-                />
-                <span>I agree to receive communication about Canary Waves.</span>
-              </label>
-              {errors.consent && <span className="form-error">{errors.consent}</span>}
-              {submitError && (
-                <p className="form-error" role="alert">
-                  {submitError}
-                </p>
-              )}
-
-              <button type="submit" className="btn btn-gold" disabled={isSubmitting}>
-                {isSubmitting ? 'Submitting...' : 'Request demo'}
-              </button>
-            </form>
-          )}
+        <div>
+          <div className="form-wrap">
+            {submitted ? (
+              <div id="form-thanks" style={{ display: 'block' }}>
+                ✓ Request received. We&apos;ll be in touch within one business day.
+              </div>
+            ) : (
+              <form id="demo-form" onSubmit={onSubmit} noValidate>
+                <div className="form-row">
+                  <div className="field">
+                    <label htmlFor="name">Name</label>
+                    <input
+                      id="name"
+                      type="text"
+                      placeholder="Your name"
+                      value={values.name}
+                      onChange={onFieldChange('name')}
+                      required
+                    />
+                    {errors.name ? <span className="form-error">{errors.name}</span> : null}
+                  </div>
+                  <div className="field">
+                    <label htmlFor="company">Company</label>
+                    <input
+                      id="company"
+                      type="text"
+                      placeholder="Operation name"
+                      value={values.company}
+                      onChange={onFieldChange('company')}
+                      required
+                    />
+                    {errors.company ? <span className="form-error">{errors.company}</span> : null}
+                  </div>
+                </div>
+                <div className="form-full field">
+                  <label htmlFor="email">Email</label>
+                  <input
+                    id="email"
+                    type="email"
+                    placeholder="your@email.com"
+                    value={values.email}
+                    onChange={onFieldChange('email')}
+                    required
+                  />
+                  {errors.email ? <span className="form-error">{errors.email}</span> : null}
+                </div>
+                <div className="form-full field" style={{ marginBottom: 14 }}>
+                  <label htmlFor="message">Message (optional)</label>
+                  <textarea
+                    id="message"
+                    rows={3}
+                    placeholder="Tell us about your site — radios, channels, key safety challenges..."
+                    value={values.message}
+                    onChange={onFieldChange('message')}
+                  />
+                </div>
+                <label className="check-row" htmlFor="agree">
+                  <input
+                    id="agree"
+                    type="checkbox"
+                    checked={agreed}
+                    onChange={(event) => {
+                      setAgreed(event.target.checked);
+                      if (errors.consent) {
+                        setErrors((current) => ({ ...current, consent: undefined }));
+                      }
+                    }}
+                    required
+                  />
+                  I&apos;m open to hearing how Canary Waves could work for my operation.
+                </label>
+                {errors.consent ? <span className="form-error">{errors.consent}</span> : null}
+                {submitError ? (
+                  <p className="form-error" role="alert">
+                    {submitError}
+                  </p>
+                ) : null}
+                <button type="submit" className="form-submit" disabled={isSubmitting}>
+                  {isSubmitting ? 'Submitting...' : 'Book my walkthrough →'}
+                </button>
+              </form>
+            )}
+          </div>
         </div>
       </div>
     </section>

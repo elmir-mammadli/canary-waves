@@ -120,7 +120,7 @@ export default function ImpactSection({ content }: ImpactSectionProps) {
   }, []);
 
   return (
-    <section ref={sectionRef} className="section section-impact" data-reveal>
+    <section id="stats" ref={sectionRef} className="section section-impact" data-reveal>
       <div className="shell impact-layout">
         <div className="impact-visual-column">
           <div className="impact-visual">

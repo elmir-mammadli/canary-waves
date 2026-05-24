@@ -1,5 +1,6 @@
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
+import MarketingEffects from '@/components/MarketingEffects';
 import SectionRenderer from '@/components/SectionRenderer';
 import RequestDemoModal from '@/components/RequestDemoModal';
 import { getPageBySlug } from '@/lib/strapi';
@@ -11,6 +12,7 @@ export default async function Home() {
 
   return (
     <>
+      <MarketingEffects />
       <Navbar />
       <main className="site-main">
         <SectionRenderer sections={page.sections} />

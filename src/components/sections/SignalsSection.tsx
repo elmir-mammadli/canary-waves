@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import type { SignalsSectionContent } from '@/lib/page-content';
 import CmsRichText from '@/components/CmsRichText';
+import { linesFromNewlines } from '@/lib/format-heading';
 
 interface SignalsSectionProps {
   content: SignalsSectionContent;
@@ -8,35 +9,25 @@ interface SignalsSectionProps {
 
 export default function SignalsSection({ content }: SignalsSectionProps) {
   return (
-    <section id="signals" className="section section-signals" data-reveal>
-      <div className="shell">
-        <p className="eyebrow">{content.eyebrow}</p>
-        <h2 className="section-title">{content.title}</h2>
+    <section id="signals">
+      <p className="sec-label">{content.eyebrow}</p>
+      <h2>{linesFromNewlines(content.title)}</h2>
 
-        <div className="feature-stack">
-          {content.items.map((feature, index) => (
-            <article
-              key={feature.title}
-              className={`feature-row ${feature.reverseLayout || index % 2 === 1 ? 'is-reversed' : ''}`.trim()}
-            >
-              <div className="feature-media-wrap">
-                <Image
-                  src={feature.imageUrl}
-                  alt={feature.imageAlt}
-                  width={990}
-                  height={624}
-                  className="feature-media"
-                />
-              </div>
-              <div className="feature-text">
-                <h3>{feature.title}</h3>
-                {feature.kicker ? <p className="feature-subtitle">{feature.kicker}</p> : null}
-                <CmsRichText value={feature.summary} className="feature-richtext" />
-              </div>
-            </article>
-          ))}
-        </div>
-      </div>
+      {content.items.map((item, index) => {
+        const flip = item.reverseLayout || index % 2 === 1;
+        return (
+          <div key={item.title} className={`signal-item fade-up${flip ? ' flip' : ''}`}>
+            <div className="signal-img">
+              <Image src={item.imageUrl} alt={item.imageAlt} width={1200} height={900} />
+            </div>
+            <div className="signal-text">
+              <h3>{linesFromNewlines(item.title)}</h3>
+              {item.kicker ? <span className="signal-kicker">{item.kicker}</span> : null}
+              <CmsRichText value={item.summary} />
+            </div>
+          </div>
+        );
+      })}
     </section>
   );
 }

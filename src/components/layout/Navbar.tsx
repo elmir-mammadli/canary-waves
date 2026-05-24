@@ -12,14 +12,7 @@ const links = [
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState('home');
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
 
   useEffect(() => {
     const observers: IntersectionObserver[] = [];
@@ -53,7 +46,7 @@ export default function Navbar() {
   useEffect(() => {
     if (!menuOpen) return;
     const onResize = () => {
-      if (window.innerWidth >= 810) setMenuOpen(false);
+      if (window.innerWidth >= 900) setMenuOpen(false);
     };
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
@@ -74,13 +67,13 @@ export default function Navbar() {
   }, [menuOpen]);
 
   return (
-    <header className={`site-header ${scrolled ? 'is-scrolled' : ''} ${menuOpen ? 'menu-open' : ''}`}>
-      <nav className="nav-shell" aria-label="Main navigation">
+    <>
+      <nav>
         <a href="#home" className="nav-logo" aria-label="Canary Waves home">
           <img src="/canary_waves_logo.svg" alt="Canary Waves" />
         </a>
 
-        <ul className="nav-links" role="list">
+        <ul className="nav-links">
           {links.map((link) => {
             const sectionId = link.href.slice(1);
             return (
@@ -94,7 +87,7 @@ export default function Navbar() {
         </ul>
 
         <a href="#contact" className="nav-cta" data-demo-trigger>
-          Request Demo
+          Book a Demo
         </a>
 
         <button
@@ -118,7 +111,10 @@ export default function Navbar() {
       />
 
       <div id="mobile-nav" className={`mobile-panel ${menuOpen ? 'is-open' : ''}`}>
-        <ul role="list">
+        <button type="button" className="mobile-close" onClick={() => setMenuOpen(false)} aria-label="Close menu">
+          ×
+        </button>
+        <ul>
           {links.map((link) => (
             <li key={link.href}>
               <a
@@ -132,11 +128,11 @@ export default function Navbar() {
           ))}
           <li>
             <a href="#contact" className="mobile-cta" data-demo-trigger onClick={() => setMenuOpen(false)}>
-              Request Demo
+              Book a Demo
             </a>
           </li>
         </ul>
       </div>
-    </header>
+    </>
   );
 }
