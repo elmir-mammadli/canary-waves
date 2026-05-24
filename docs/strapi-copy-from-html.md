@@ -64,7 +64,7 @@
 | `proofItems[0].text` | `No new radio hardware required` |
 | `proofItems[1].text` | `Works passively on your existing infrastructure` |
 | `proofItems[2].text` | `Early warnings reach leadership — not just the incident report` |
-| `image` | Фон hero (в HTML — embedded base64; в проекте: `/images/hero.avif`) |
+| `image` | Фон hero (в HTML — embedded base64; в проекте: `/images/download.png`) |
 
 **Разметка:** `h1` с `<em>` на второй фразе; `hero-bg` + gradient overlay.
 
@@ -83,6 +83,7 @@
 ### Stat card (нет полей в схеме)
 
 В HTML отдельная карточка `.platform-stat-card` — **полей в `platform.json` нет**.
+Картинка карточки в коде: `/images/download_50plus.png`.
 
 | UI-элемент | Текст из HTML | Предлагаемый workaround (без смены схемы) |
 |------------|---------------|---------------------------------------------|

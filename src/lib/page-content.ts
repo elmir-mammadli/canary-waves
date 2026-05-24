@@ -156,7 +156,7 @@ export const defaultHomePage: PageContent = {
         'Works passively on your existing infrastructure',
         'Early warnings reach leadership — not just the incident report',
       ],
-      imageUrl: '/images/hero.avif',
+      imageUrl: '/images/download.png',
       imageAlt: 'Mining site operations',
     },
     {

@@ -28,7 +28,7 @@ export default function PlatformSection({ content }: PlatformSectionProps) {
           <div
             className="platform-stat-card fade-up"
             style={{
-              backgroundImage: `linear-gradient(to bottom, rgba(31,23,22,0.55) 0%, rgba(31,23,22,0.78) 100%), url('/images/hero.avif')`,
+              backgroundImage: `linear-gradient(to bottom, rgba(31,23,22,0.55) 0%, rgba(31,23,22,0.78) 100%), url('/images/download_50plus.png')`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
             }}

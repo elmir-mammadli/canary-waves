@@ -17,7 +17,7 @@ Image fields are media uploads in Strapi. Use the matching site assets from `pub
 - `subheading`: `Your crews are already broadcasting the warnings. Canary Waves makes sure the right people hear them.`
 - `primaryCtaLabel`: `Book a demo ->`
 - `secondaryCtaLabel`: `See what we detect`
-- `image`: upload/use `hero.avif`
+- `image`: upload/use `download.png`
 
 `proofItems` (`shared.text-item`):
 
@@ -41,6 +41,8 @@ hold data no one is reading.`
 - `text`: `50+`
 - `text`: `Years of two-way radio`
 - `text`: `The technology your crews rely on every shift. Zero safety intelligence extracted. Until now.`
+
+Image used by this visual card in code: `download_50plus.png`.
 
 ---
 

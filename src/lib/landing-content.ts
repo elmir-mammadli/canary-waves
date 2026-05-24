@@ -144,7 +144,7 @@ export const defaultLandingPageContent: LandingPageContent = {
       'Passive capture and analysis of existing comms',
       'Structured alerts for ops and safety leaders',
     ],
-    imageUrl: '/images/hero.avif',
+    imageUrl: '/images/download.png',
     imageAlt: 'Mining site operations',
   },
   about: {

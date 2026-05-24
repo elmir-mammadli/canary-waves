@@ -57,7 +57,7 @@ nav{
 }
 .hero-bg{
   position:absolute;inset:0;
-  background:url('/images/hero.avif') center/cover no-repeat;
+  background:url('/images/download.png') center/cover no-repeat;
   opacity:1;
   animation:kenburns 22s ease-in-out infinite alternate;
 }
@@ -151,13 +151,14 @@ h2 em{font-style:italic;color:var(--watcher);font-weight:300}
   padding:44px 48px;position:relative;overflow:hidden;
   display:flex;flex-direction:column;
   min-height:280px;
+  animation:kenburns 22s ease-in-out infinite alternate;
   background:
     linear-gradient(
       to bottom,
       rgba(31,23,22,0.55) 0%,
       rgba(31,23,22,0.78) 100%
     ),
-    url('/images/hero.avif') center/cover no-repeat;
+    url('/images/download_50plus.png') center/cover no-repeat;
 }
 /* no wave lines — clean */
 .platform-stat-card::before{display:none}
