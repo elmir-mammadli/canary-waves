@@ -50,8 +50,8 @@ export default function Footer() {
         <FooterCol title="Connect" links={contactLinks} />
       </div>
       <div className="footer-bottom">
-        <p>© 2025 Canary Waves · Part of KB&G Innovation Studio</p>
-        <p>A product built for the frontline.</p>
+        <p>© 2026 Canary Waves · Part of KB&G Innovation Studio</p>
+        {/* <p>A product built for the frontline.</p>  */}
       </div>
     </footer>
   );
