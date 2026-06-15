@@ -12,7 +12,7 @@ const legalLinks = [
 ];
 
 const contactLinks = [
-  { label: 'jack@canarywaves.com', href: 'mailto:jack@canarywaves.com' },
+  { label: 'jack@canary-waves.com', href: 'mailto:jack@canary-waves.com' },
   { label: 'LinkedIn', href: 'https://www.linkedin.com/company/canary-waves/' },
 ];
 
