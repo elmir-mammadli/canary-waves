@@ -14,9 +14,16 @@ function normalizeStrapiUrl(rawUrl?: string) {
 
 const STRAPI_URL = normalizeStrapiUrl(process.env.STRAPI_URL || process.env.NEXT_PUBLIC_STRAPI_URL);
 
+interface FormFieldMeta {
+  id?: number;
+  label: string;
+  type?: string;
+  required?: boolean;
+}
+
 interface ContactPayload {
-  values?: Record<string, unknown>;
-  source?: string;
+  fields?: FormFieldMeta[];
+  values?: Record<string, string>;
   [key: string]: unknown;
 }
 
@@ -29,8 +36,17 @@ interface StrapiSubmissionPayload {
   payload: Record<string, unknown>;
 }
 
+function normalizeKey(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function getStringValue(record: Record<string, string>, key: string) {
+  const value = record[key];
+  return typeof value === 'string' ? value.trim() : '';
 }
 
 function toStringRecord(value: unknown) {
@@ -43,9 +59,51 @@ function toStringRecord(value: unknown) {
   ) as Record<string, string>;
 }
 
-function getValue(record: Record<string, string>, key: string) {
-  const value = record[key];
-  return typeof value === 'string' ? value.trim() : '';
+function inferFieldValue(
+  values: Record<string, string>,
+  fields: FormFieldMeta[],
+  options: {
+    types?: string[];
+    labelIncludes?: string[];
+    keyIncludes?: string[];
+  }
+) {
+  const lowerTypes = new Set((options.types || []).map((type) => type.toLowerCase()));
+  const labelPatterns = (options.labelIncludes || []).map(normalizeKey);
+  const keyPatterns = (options.keyIncludes || []).map(normalizeKey);
+
+  for (const field of fields) {
+    const normalizedLabel = normalizeKey(field.label || '');
+    const fieldKey = (field.label || '').toLowerCase().replace(/\s+/g, '_');
+    const normalizedKey = normalizeKey(fieldKey);
+    const value = getStringValue(values, fieldKey);
+
+    if (!value) continue;
+
+    if (field.type && lowerTypes.has(field.type.toLowerCase())) {
+      return value;
+    }
+
+    if (labelPatterns.some((pattern) => normalizedLabel.includes(pattern))) {
+      return value;
+    }
+
+    if (keyPatterns.some((pattern) => normalizedKey.includes(pattern))) {
+      return value;
+    }
+  }
+
+  for (const [key, rawValue] of Object.entries(values)) {
+    const value = typeof rawValue === 'string' ? rawValue.trim() : '';
+    if (!value) continue;
+
+    const normalizedKey = normalizeKey(key);
+    if (keyPatterns.some((pattern) => normalizedKey.includes(pattern))) {
+      return value;
+    }
+  }
+
+  return '';
 }
 
 async function submitToStrapi(payload: StrapiSubmissionPayload) {
@@ -86,12 +144,30 @@ async function submitToStrapi(payload: StrapiSubmissionPayload) {
 export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as ContactPayload;
-    const values = toStringRecord(body.values ?? body);
-    const source = typeof body.source === 'string' && body.source.trim() ? body.source.trim() : 'website-contact';
-    const name = getValue(values, 'name');
-    const email = getValue(values, 'email');
-    const company = getValue(values, 'company');
-    const message = getValue(values, 'message');
+    const values = body.values ? toStringRecord(body.values) : toStringRecord(body);
+    const fields = Array.isArray(body.fields) ? body.fields : [];
+    const source =
+      request.headers.get('x-form-source')?.trim() ||
+      (typeof body.source === 'string' && body.source.trim() ? body.source.trim() : 'website-contact');
+
+    const name = inferFieldValue(values, fields, {
+      labelIncludes: ['name', 'fullname', 'yourname'],
+      keyIncludes: ['name', 'fullname', 'yourname'],
+    });
+    const email = inferFieldValue(values, fields, {
+      types: ['email'],
+      labelIncludes: ['email', 'businessemail', 'workemail'],
+      keyIncludes: ['email', 'businessemail', 'workemail'],
+    });
+    const company = inferFieldValue(values, fields, {
+      labelIncludes: ['company', 'organization', 'business', 'firm'],
+      keyIncludes: ['company', 'organization', 'business', 'firm'],
+    });
+    const message = inferFieldValue(values, fields, {
+      types: ['textarea'],
+      labelIncludes: ['message', 'details', 'help', 'comment', 'notes', 'inquiry'],
+      keyIncludes: ['message', 'details', 'help', 'comment', 'notes', 'inquiry'],
+    });
 
     if (!name || !email) {
       return NextResponse.json({ message: 'Name and email are required' }, { status: 400 });
@@ -109,6 +185,7 @@ export async function POST(request: NextRequest) {
       source,
       payload: {
         values,
+        fields,
         submittedFrom: request.headers.get('origin') || request.headers.get('referer') || '',
       },
     });

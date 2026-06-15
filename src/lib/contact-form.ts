@@ -5,6 +5,13 @@ export interface ContactFormValues {
   message: string;
 }
 
+export interface ContactFormField {
+  id: number;
+  label: string;
+  type: string;
+  required: boolean;
+}
+
 export interface ContactFormErrors {
   name?: string;
   company?: string;
@@ -15,6 +22,13 @@ export interface ContactFormErrors {
 export interface ContactFormSubmissionOptions {
   source: string;
 }
+
+export const contactFormFields: ContactFormField[] = [
+  { id: 1, label: 'Name', type: 'text', required: true },
+  { id: 2, label: 'Company', type: 'text', required: true },
+  { id: 3, label: 'Email', type: 'email', required: true },
+  { id: 4, label: 'Message', type: 'textarea', required: false },
+];
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -45,10 +59,16 @@ export async function submitContactForm(
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'X-Form-Source': options.source,
     },
     body: JSON.stringify({
       values,
-      source: options.source,
+      fields: contactFormFields.map(({ id, label, type, required }) => ({
+        id,
+        label,
+        type,
+        required,
+      })),
     }),
   });
 
