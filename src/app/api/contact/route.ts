@@ -13,6 +13,7 @@ function normalizeStrapiUrl(rawUrl?: string) {
 }
 
 const STRAPI_URL = normalizeStrapiUrl(process.env.STRAPI_URL || process.env.NEXT_PUBLIC_STRAPI_URL);
+const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN;
 
 interface FormFieldMeta {
   id?: number;
@@ -24,6 +25,7 @@ interface FormFieldMeta {
 interface ContactPayload {
   fields?: FormFieldMeta[];
   values?: Record<string, string>;
+  source?: string;
   [key: string]: unknown;
 }
 
@@ -106,39 +108,74 @@ function inferFieldValue(
   return '';
 }
 
+function buildStrapiData(payload: StrapiSubmissionPayload) {
+  return {
+    name: payload.name,
+    email: payload.email,
+    company: payload.company,
+    message: payload.message,
+    source: payload.source,
+    payload: payload.payload,
+  };
+}
+
 async function submitToStrapi(payload: StrapiSubmissionPayload) {
-  const headers = {
+  const data = buildStrapiData(payload);
+  const jsonHeaders = {
     'Content-Type': 'application/json',
   };
 
-  const submitResponse = await fetch(`${STRAPI_URL}/api/form-submissions/submit`, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify(payload),
-  });
-
-  if (submitResponse.ok) {
-    return submitResponse;
-  }
-
-  if (submitResponse.status !== 404 && submitResponse.status !== 405) {
-    return submitResponse;
-  }
-
-  return fetch(`${STRAPI_URL}/api/form-submissions`, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({
-      data: {
-        name: payload.name,
-        email: payload.email,
-        company: payload.company,
-        message: payload.message,
-        source: payload.source,
-        payload: payload.payload,
+  const attempts: Array<{ url: string; init: RequestInit }> = [
+    {
+      url: `${STRAPI_URL}/api/form-submissions/submit`,
+      init: {
+        method: 'POST',
+        headers: jsonHeaders,
+        body: JSON.stringify(data),
       },
-    }),
+    },
+  ];
+
+  if (STRAPI_TOKEN) {
+    attempts.push({
+      url: `${STRAPI_URL}/api/form-submissions`,
+      init: {
+        method: 'POST',
+        headers: {
+          ...jsonHeaders,
+          Authorization: `Bearer ${STRAPI_TOKEN}`,
+        },
+        body: JSON.stringify({ data }),
+      },
+    });
+  }
+
+  attempts.push({
+    url: `${STRAPI_URL}/api/form-submissions`,
+    init: {
+      method: 'POST',
+      headers: jsonHeaders,
+      body: JSON.stringify({ data }),
+    },
   });
+
+  let lastResponse: Response | null = null;
+
+  for (const attempt of attempts) {
+    const response = await fetch(attempt.url, attempt.init);
+    lastResponse = response;
+
+    if (response.ok) {
+      return response;
+    }
+
+    // Try the next strategy when the route, method, or permissions block this attempt.
+    if (response.status !== 404 && response.status !== 405 && response.status !== 403) {
+      return response;
+    }
+  }
+
+  return lastResponse ?? new Response(null, { status: 502 });
 }
 
 export async function POST(request: NextRequest) {
@@ -177,6 +214,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Invalid email address' }, { status: 400 });
     }
 
+    if (!STRAPI_TOKEN) {
+      console.error('Missing STRAPI_API_TOKEN in environment');
+      return NextResponse.json({ message: 'Server configuration error' }, { status: 500 });
+    }
+
     const strapiResponse = await submitToStrapi({
       name,
       email,
@@ -196,16 +238,19 @@ export async function POST(request: NextRequest) {
         status: strapiResponse.status,
         statusText: strapiResponse.statusText,
         body: errorText,
-        targetUrl: `${STRAPI_URL}/api/form-submissions/submit`,
+        targetUrl: `${STRAPI_URL}/api/form-submissions`,
+        hasToken: Boolean(STRAPI_TOKEN),
       });
 
+      if (strapiResponse.status === 403) {
+        return NextResponse.json(
+          { message: 'Form submission is blocked by Strapi permissions' },
+          { status: 502 }
+        );
+      }
+
       return NextResponse.json(
-        {
-          message:
-            strapiResponse.status === 403
-              ? 'Form submission is blocked by Strapi permissions'
-              : 'Failed to submit form. Please try again.',
-        },
+        { message: 'Failed to submit form. Please try again.' },
         { status: 502 }
       );
     }
