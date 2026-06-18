@@ -76,7 +76,6 @@ async function sendViaResend(data: ContactNotificationData) {
     subject: buildContactNotificationSubject(data),
     html: buildContactNotificationHtml(data),
     text: buildContactNotificationText(data),
-    idempotencyKey: `contact-form/${data.email}-${Date.now()}`,
   };
 
   const preferredRecipient = getRecipient();
@@ -97,7 +96,6 @@ async function sendViaResend(data: ContactNotificationData) {
       result = await resend.emails.send({
         ...payload,
         to: [allowedRecipient],
-        idempotencyKey: `${payload.idempotencyKey}-fallback`,
       });
     }
   }
