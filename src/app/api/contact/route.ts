@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import {
+  isContactEmailConfigured,
+  sendContactNotificationEmail,
+} from '@/lib/email/send-contact-notification';
 
 function normalizeStrapiUrl(rawUrl?: string) {
   const fallback = 'http://localhost:1337';
@@ -169,7 +173,6 @@ async function submitToStrapi(payload: StrapiSubmissionPayload) {
       return response;
     }
 
-    // Try the next strategy when the route, method, or permissions block this attempt.
     if (response.status !== 404 && response.status !== 405 && response.status !== 403) {
       return response;
     }
@@ -186,6 +189,7 @@ export async function POST(request: NextRequest) {
     const source =
       request.headers.get('x-form-source')?.trim() ||
       (typeof body.source === 'string' && body.source.trim() ? body.source.trim() : 'website-contact');
+    const submittedFrom = request.headers.get('origin') || request.headers.get('referer') || '';
 
     const name = inferFieldValue(values, fields, {
       labelIncludes: ['name', 'fullname', 'yourname'],
@@ -214,12 +218,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Invalid email address' }, { status: 400 });
     }
 
-    if (!STRAPI_TOKEN) {
-      console.error('Missing STRAPI_API_TOKEN in environment');
+    const emailConfigured = isContactEmailConfigured();
+    const strapiConfigured = Boolean(STRAPI_TOKEN);
+
+    if (!emailConfigured && !strapiConfigured) {
+      console.error('Missing RESEND_API_KEY and STRAPI_API_TOKEN in environment');
       return NextResponse.json({ message: 'Server configuration error' }, { status: 500 });
     }
 
-    const strapiResponse = await submitToStrapi({
+    const notificationData = {
+      name,
+      email,
+      company,
+      message,
+      source,
+      submittedFrom,
+    };
+
+    const strapiPayload = {
       name,
       email,
       company,
@@ -228,19 +244,30 @@ export async function POST(request: NextRequest) {
       payload: {
         values,
         fields,
-        submittedFrom: request.headers.get('origin') || request.headers.get('referer') || '',
+        submittedFrom,
       },
-    });
+    };
 
-    if (!strapiResponse.ok) {
-      const errorText = await strapiResponse.text();
-      console.error('Strapi submission failed:', {
-        status: strapiResponse.status,
-        statusText: strapiResponse.statusText,
-        body: errorText,
-        targetUrl: `${STRAPI_URL}/api/form-submissions`,
-        hasToken: Boolean(STRAPI_TOKEN),
-      });
+    const [strapiResponse, emailSent] = await Promise.all([
+      strapiConfigured ? submitToStrapi(strapiPayload) : Promise.resolve(new Response(null, { status: 503 })),
+      sendContactNotificationEmail(notificationData),
+    ]);
+
+    const strapiOk = strapiResponse.ok;
+    const deliveryOk = strapiOk || emailSent;
+
+    if (!deliveryOk) {
+      if (!strapiOk) {
+        const errorText = await strapiResponse.text();
+        console.error('Strapi submission failed:', {
+          status: strapiResponse.status,
+          statusText: strapiResponse.statusText,
+          body: errorText,
+          targetUrl: `${STRAPI_URL}/api/form-submissions`,
+          hasToken: Boolean(STRAPI_TOKEN),
+          emailSent,
+        });
+      }
 
       if (strapiResponse.status === 403) {
         return NextResponse.json(
@@ -253,6 +280,14 @@ export async function POST(request: NextRequest) {
         { message: 'Failed to submit form. Please try again.' },
         { status: 502 }
       );
+    }
+
+    if (!strapiOk) {
+      console.warn('Strapi submission failed, but contact notification email was sent.');
+    }
+
+    if (!emailSent && emailConfigured) {
+      console.warn('Contact notification email failed, but Strapi submission succeeded.');
     }
 
     return NextResponse.json({ message: 'Form submitted successfully' });
