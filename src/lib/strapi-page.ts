@@ -5,6 +5,7 @@ import {
   type FAQSectionContent,
   type HeroSectionContent,
   type ImpactSectionContent,
+  type LegalDocumentsSectionContent,
   type PageContent,
   type PageSection,
   type PlatformSectionContent,
@@ -55,6 +56,7 @@ const COMPONENT_TYPE_MAP: Record<string, PageSection['type']> = {
   'sections.team': 'team',
   'sections.contact': 'contact',
   'sections.faq': 'faq',
+  'sections.legal-documents': 'legal-documents',
 };
 
 function asRecord(value: unknown): JsonRecord | null {
@@ -409,6 +411,14 @@ function parseFaq(raw: JsonRecord, fallback: FAQSectionContent): FAQSectionConte
   };
 }
 
+function parseLegalDocuments(raw: JsonRecord): LegalDocumentsSectionContent {
+  return {
+    type: 'legal-documents',
+    privacyPolicy: extractRichText(raw.privacyPolicy) ?? '',
+    termsOfUse: extractRichText(raw.termsOfUse) ?? '',
+  };
+}
+
 function parseSection(raw: JsonRecord, fallbacks: PageSection[]): PageSection | null {
   const component = getString(raw.__component);
   const type = component ? COMPONENT_TYPE_MAP[component] : null;
@@ -436,12 +446,14 @@ function parseSection(raw: JsonRecord, fallbacks: PageSection[]): PageSection | 
       return parseContact(raw, fallback as ContactSectionContent);
     case 'faq':
       return parseFaq(raw, fallback as FAQSectionContent);
+    case 'legal-documents':
+      return parseLegalDocuments(raw);
     default:
       return null;
   }
 }
 
-function parsePage(raw: JsonRecord | null): PageContent {
+function parsePage(raw: JsonRecord | null, requestedSlug = 'home'): PageContent {
   if (!raw) return defaultHomePage;
 
   const sectionsRaw = raw.sections;
@@ -455,7 +467,12 @@ function parsePage(raw: JsonRecord | null): PageContent {
   return {
     title: getString(raw.title) ?? defaultHomePage.title,
     slug: getString(raw.slug) ?? defaultHomePage.slug,
-    sections: sections.length ? sections : defaultHomePage.sections,
+    sections:
+      sections.length
+        ? sections
+        : requestedSlug === 'home'
+          ? defaultHomePage.sections
+          : [],
   };
 }
 
@@ -487,7 +504,7 @@ export async function getPageBySlug(slug: string): Promise<PageContent> {
       return defaultHomePage;
     }
 
-    return parsePage(pageData);
+    return parsePage(pageData, slug);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     if (STRAPI_FAIL_ON_ERROR) throw new Error(`Strapi page fetch failed: ${message}`);

@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_sections_legal_documents",
+  "info": {
+    "displayName": "Privacy Policy and Terms of Use",
+    "icon": "file",
+    "description": "Large editors for legal page content"
+  },
+  "options": {},
+  "attributes": {
+    "privacyPolicy": {
+      "type": "richtext"
+    },
+    "termsOfUse": {
+      "type": "richtext"
+    }
+  }
+}

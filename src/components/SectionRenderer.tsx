@@ -7,6 +7,7 @@ import SignalsSection from '@/components/sections/SignalsSection';
 import TeamSection from '@/components/sections/TeamSection';
 import WhyUsWithImpactSection from '@/components/sections/WhyUsWithImpactSection';
 import WorkflowSection from '@/components/sections/WorkflowSection';
+import LegalDocumentsSection from '@/components/sections/LegalDocumentsSection';
 
 interface SectionRendererProps {
   sections: PageSection[];
@@ -42,6 +43,8 @@ function renderSection(section: PageSection, index: number, sections: PageSectio
       return <ContactSection key={key} content={section} />;
     case 'faq':
       return <FAQSection key={key} content={section} />;
+    case 'legal-documents':
+      return <LegalDocumentsSection key={key} content={section} />;
     default:
       return null;
   }

@@ -121,6 +121,12 @@ export interface FAQSectionContent {
   items: FAQItemContent[];
 }
 
+export interface LegalDocumentsSectionContent {
+  type: 'legal-documents';
+  privacyPolicy: string;
+  termsOfUse: string;
+}
+
 export type PageSection =
   | HeroSectionContent
   | PlatformSectionContent
@@ -130,7 +136,8 @@ export type PageSection =
   | ImpactSectionContent
   | TeamSectionContent
   | ContactSectionContent
-  | FAQSectionContent;
+  | FAQSectionContent
+  | LegalDocumentsSectionContent;
 
 export interface PageContent {
   title: string;

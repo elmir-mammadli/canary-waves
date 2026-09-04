@@ -32,7 +32,8 @@
         "sections.impact",
         "sections.team",
         "sections.contact",
-        "sections.faq"
+        "sections.faq",
+        "sections.legal-documents"
       ]
     }
   }
