@@ -7,8 +7,8 @@ const siteLinks = [
 ];
 
 const legalLinks = [
-  { label: 'Privacy Policy', href: 'https://kbngconsulting.com/privacy-policy' },
-  { label: 'Terms of Service', href: 'https://kbngconsulting.com/terms-of-use' },
+  { label: 'Privacy Policy', href: '/privacy-policy' },
+  { label: 'Terms of Use', href: '/terms-of-use' },
 ];
 
 const contactLinks = [
